@@ -1,8 +1,8 @@
 import { z } from "zod";
-import clientPromise from "~/server/db/mongodb";
 import { validateEmail, validateEmailDomain } from "~/utils/validation";
 
 import crypto from "crypto";
+import { getCollection } from "../db/mongodb";
 
 const bodySchema = z.object({
     email: z.string().email(),
@@ -29,10 +29,7 @@ export default defineEventHandler(async (event) => {
             message: "请使用指定的邮箱",
         };
     }
-
-    const client = await clientPromise;
-    const db = client.db("ProPassGuide");
-    const users = db.collection("users");
+    const users = await getCollection("users");
 
     const query = { email };
     const user = await users.findOne<{

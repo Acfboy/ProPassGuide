@@ -1,6 +1,6 @@
 import { z } from "zod";
-import clientPromise from "~/server/db/mongodb";
 import crypto from "crypto";
+import { getCollection } from "../db/mongodb";
 
 const bodySchema = z.object({
     email: z.string().email(),
@@ -28,9 +28,7 @@ export default defineEventHandler(async (event) => {
         .createHash("sha256")
         .update(password + config.salt)
         .digest("hex");
-    const client = await clientPromise;
-    const db = client.db("ProPassGuide");
-    const users = db.collection("users");
+    const users = await getCollection("users");
     const data = await users.findOne<{ email: string; password: string }>(
         { email }
     );
