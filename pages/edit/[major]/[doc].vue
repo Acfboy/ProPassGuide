@@ -1,16 +1,16 @@
 <template>
-    <div style="height: 100%;" ref="totalSpace">
+    <div ref="totalSpace" style="height: 100%;">
         <v-breadcrumbs>
             <v-breadcrumbs-item to="/edit">编辑专业</v-breadcrumbs-item>
-            <v-breadcrumbs-divider/>
+            <v-breadcrumbs-divider />
             <v-breadcrumbs-item :to="`/edit/${$route.params.major}`">编辑课程</v-breadcrumbs-item>
-            <v-breadcrumbs-divider/>
-            <v-breadcrumbs-item :disabled="true" >编辑文档</v-breadcrumbs-item>
+            <v-breadcrumbs-divider />
+            <v-breadcrumbs-item :disabled="true">编辑文档</v-breadcrumbs-item>
         </v-breadcrumbs>
-        <v-row class="ml-1 mr-1" ref="row1Space">
+        <v-row ref="row1Space" class="ml-1 mr-1">
             <v-col>
-                <v-text-field variant="outlined" hide-details label="课程名称" density="compact"
-                    v-model="newCourse.course_name" />
+                <v-text-field v-model="newCourse.course_name" variant="outlined" hide-details label="课程名称"
+                    density="compact" />
             </v-col>
             <v-col>
                 <v-btn-toggle v-model="toggle" divided>
@@ -33,29 +33,29 @@
             </v-col>
         </v-row>
         <v-form v-model="infoValid">
-            <v-row class="ml-1 mr-1 " ref="row2Space">
+            <v-row ref="row2Space" class="ml-1 mr-1 ">
                 <v-col>
-                    <v-number-input :precision="1" :step="0.5" controlVariant="split" label="学分" :hideInput="false"
-                        :inset="false" variant="outlined" v-model="newCourse.credit" density="compact"></v-number-input>
+                    <v-number-input v-model="newCourse.credit" :precision="1" :step="0.5" control-variant="split"
+                        label="学分" :hide-input="false" :inset="false" variant="outlined" density="compact" />
                 </v-col>
 
                 <v-col>
-                    <v-combobox :items="classNames" variant="outlined" density="compact" v-model="newCourse.class"
+                    <v-combobox v-model="newCourse.class" :items="classNames" variant="outlined" density="compact"
                         label="类型" />
                 </v-col>
 
                 <v-col>
-                    <v-combobox :items="gradeName" variant="outlined" density="compact" v-model="grade" label="年级"
+                    <v-combobox v-model="grade" :items="gradeName" variant="outlined" density="compact" label="年级"
                         :rules="[checkGrade]" />
                 </v-col>
 
                 <v-col>
-                    <v-text-field variant="outlined" v-model="newCourse.direction" label="专业方向" hint="不区分方向则留空"
+                    <v-text-field v-model="newCourse.direction" variant="outlined" label="专业方向" hint="不区分方向则留空"
                         density="compact" />
                 </v-col>
             </v-row>
         </v-form>
-        <v-row justify="center" class="ml-1 mr-1" v-show="toggle == 'unique'">
+        <v-row v-show="toggle == 'unique'" justify="center" class="ml-1 mr-1">
             <v-col>
                 <v-card class="flex-grow-1">
                     <v-tabs v-model="tab" bg-color="primary" density="compact">
@@ -65,7 +65,7 @@
                     <v-card-text>
                         <v-tabs-window v-model="tab">
                             <v-tabs-window-item value="editor">
-                                <MonacoEditor :style="`height: ${editorHeight}px`" v-model="newCourse.doc_str"
+                                <MonacoEditor v-model="newCourse.doc_str" :style="`height: ${editorHeight}px`"
                                     lang="markdown" />
                             </v-tabs-window-item>
 
@@ -80,35 +80,43 @@
             </v-col>
         </v-row>
         <v-form v-model="linkValid">
-            <v-row justify="center" class="ml-1 mr-1" v-show="toggle == 'other'">
+            <v-row v-show="toggle == 'other'" justify="center" class="ml-1 mr-1">
                 <v-col>
-                    <v-combobox label="学院" variant="solo-filled" :items="schools" v-model="link.school"
+                    <v-combobox v-model="link.school" label="学院" variant="solo-filled" :items="schools"
                         :rules="[checkSchool]" @update:model-value="getCourses" />
                 </v-col>
                 <v-col>
-                    <v-combobox label="专业" variant="solo-filled" :items="majorOfSchool" v-model="link.major"
+                    <v-combobox v-model="link.major" label="专业" variant="solo-filled" :items="majorOfSchool"
                         :rules="[checkMajorInSchool]" @update:model-value="getCourses" />
                 </v-col>
                 <v-col>
-                    <v-combobox label="课程" variant="solo-filled" v-model="link.course" :items="courseItems"
+                    <v-combobox v-model="link.course" label="课程" variant="solo-filled" :items="courseItems"
                         :loading="loadingCourses" :rules="[checkCourse]" />
                 </v-col>
             </v-row>
         </v-form>
 
-        <v-row class="ml-4 mr-4 mt-4" ref="row3Space" v-show="toggle == 'unique'">
-            <v-combobox chips multiple variant="outlined" density="compact" label="任课教师" v-model="newCourse.teachers"
+        <v-row v-show="toggle == 'unique'" ref="row3Space" class="ml-4 mr-4 mt-4">
+            <v-combobox v-model="newCourse.teachers" chips multiple variant="outlined" density="compact" label="任课教师"
                 hide-details />
         </v-row>
-        <v-row class="ml-4 mr-4" ref="row4Space" justify="end">
+        <v-row ref="row4Space" class="ml-4 mr-4" justify="end">
             <!-- <v-col> -->
-            <v-btn class="mt-2" :disabled="!infoValid || (toggle == 'other' && !linkValid)" color="primary" variant="tonal">提交</v-btn>
+            <v-btn class="mt-2" :disabled="!infoValid || (toggle == 'other' && !linkValid)" color="primary"
+                variant="tonal" @click="submit">提交</v-btn>
             <!-- </v-col> -->
         </v-row>
         <v-navigation-drawer location="right">
-            <v-file-input label="上传附件" variant="outlined" density="compact" class="ma-2" v-show="toggle == 'unique'" />
+            <v-file-input v-show="toggle == 'unique'" label="上传附件" variant="outlined" density="compact" class="ma-2" />
             <v-divider />
         </v-navigation-drawer>
+
+        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success" variant="tonal">
+            提交成功
+        </v-snackbar>
+        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error" variant="tonal">
+            {{ errorPrompt }}
+        </v-snackbar>
     </div>
 </template>
 
@@ -214,14 +222,14 @@ const grade = ref("");
  * @note 一些值因为绑定不符合最终格式，在发送请求的时候要修改。
  */
 const newCourse = ref<Course>({
-    major_id: "",
+    major_id: 0,
     grade: 0,
     course_name: "",
     direction: "",
     proposal: null,
     credit: 0,
     class: "",
-    course_id: "",
+    course_id: 0,
     doc_str: "",
     link: null,
     teachers: [],
@@ -262,6 +270,11 @@ const checkGrade = (s: string) => {
 };
 
 /**
+ * 选择使用已有文档时，将专业课程的名称转换为对应 id。
+ */
+const courseToId = new Map<string, number>();
+
+/**
  * 选择使用已有文档时，根据专业查询该专业课程。
  */
 const getCourses = () => {
@@ -278,12 +291,41 @@ const getCourses = () => {
             major: id
         }
     }).then(res => {
-        console.log(id);
-        console.log(res);
+        courseToId.clear();
+        res.forEach(c => {
+            courseToId.set(c.course_name, c.course_id);
+        });
         courseItems.value = res.map(c => c.course_name);
         loadingCourses.value = false;
     });
 };
+
+const successSnakebar = ref(false);
+const errorSnakebar = ref(false);
+const errorPrompt = ref("");
+
+const submit = () => {
+    const { proposal, ...data } = newCourse.value;
+    if (toggle.value == "other") {
+        data.doc_str = "";
+        data.link = {
+            major_id: getMajorId(link.value.school, link.value.major)!,
+            course_id: courseToId.get(link.value.course)!,
+        }
+    } else
+        data.link = null;
+
+    $fetch("/api/courses/propose-update", {
+        method: "POST",
+        body: data
+    }).then(() => {
+        successSnakebar.value = true;
+    }).catch((err) => {
+        errorPrompt.value = err.data.message;
+        errorSnakebar.value = true;
+    });
+}
+
 
 // 将选择的 grade 转换成对应编号。
 watch(grade, () => {

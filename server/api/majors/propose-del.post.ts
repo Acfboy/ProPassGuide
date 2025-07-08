@@ -2,6 +2,7 @@ import type { ObjectId } from "mongodb";
 import { z } from "zod";
 import { getCollection } from "~/server/db/mongodb";
 import { timestamp } from "~/utils/tools";
+import { SessionUserSchema } from "~/utils/types";
 
 const bodySchema = z.object({
     school: z.string(),
@@ -11,15 +12,23 @@ const bodySchema = z.object({
 
 export default defineEventHandler(async (event) => {
     const { user } = await requireUserSession(event);
+    const validateUser = SessionUserSchema.safeParse(user);
+    if (!validateUser.success) {
+        throw createError({ statusCode: 401 });
+    }
     const { school, major, reason } = await readValidatedBody(
         event,
         bodySchema.parse
     );
+    
     const majors = await getCollection("majors");
-    const goal = await majors.findOne<{ _id: ObjectId }>({ school, major_id: major });
+    const goal = await majors.findOne<{ _id: ObjectId }>({
+        school,
+        major_id: major,
+    });
     if (!goal) throw createError({ statusCode: 403, message: "专业不存在" });
     majors.insertOne({
         del_id: goal._id,
-        proposal: { reason, user, timestamp: timestamp() },
+        proposal: { reason, user: validateUser.data.name, timestamp: timestamp() },
     });
 });

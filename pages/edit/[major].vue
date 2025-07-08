@@ -4,6 +4,7 @@
             <v-list>
                 <v-list-group v-for="(gradeCourses, index) in listItems" v-show="gradeCourses.length" :key="index"
                     :value="index">
+                    <!-- eslint-disable-next-line vue/no-template-shadow -->
                     <template #activator="{ props }">
                         <v-list-item v-bind="props" :title="gradeName[index]" />
                     </template>
@@ -11,7 +12,7 @@
                         <v-divider />
                         <v-list-subheader> {{ classAndCourses[0] }}</v-list-subheader>
                         <v-list-item v-for="course in classAndCourses[1]" :key="course.course_id"
-                            :title="course.course_name" :active="$route.params.doc == course.course_id"
+                            :title="course.course_name" :active="Number($route.params.doc) == course.course_id"
                             @click="navigateTo(`/edit/${route.params.major}/${course.course_id}`)" />
                     </div>
                 </v-list-group>
@@ -37,7 +38,7 @@
                             </v-form>
                         </v-card-text>
                         <v-card-actions class="justify-center">
-                            <v-btn color="primary" :disabled="!courseValid">
+                            <v-btn color="primary" :disabled="!courseValid" @click="proposeDelete">
                                 提交申请
                             </v-btn>
                         </v-card-actions>
@@ -60,6 +61,13 @@
                 </v-col>
             </v-row>
         </div>
+
+        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success" variant="tonal">
+            提交成功
+        </v-snackbar>
+        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error" variant="tonal">
+            {{ errorPrompt }}
+        </v-snackbar>
     </div>
 </template>
 
@@ -80,6 +88,26 @@ const checkCourse = (v: string) => {
     return "没有这门课";
 }
 const courseValid = ref(false);
+
+const errorPrompt = ref("");
+const errorSnakebar = ref(false);
+const successSnakebar = ref(false);
+
+const proposeDelete = () => {
+    $fetch("/api/courses/propose-del", {
+        method: "POST",
+        body: {
+            major_id: majorId,
+            course_name: delCourse.value.name,
+            reason: delCourse.value.name,
+        }
+    })
+        .then(() => { successSnakebar.value = true; })
+        .catch((err) => {
+            errorPrompt.value = err.data.message;
+            errorSnakebar.value = true;
+        })
+};
 
 const { data: listItems } = await useAsyncData(`major-${majorId}`, () =>
     $fetch<CourseInfo[]>("/api/courses", {

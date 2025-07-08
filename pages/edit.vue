@@ -7,7 +7,7 @@
                         <v-list-item v-bind="props" :title="school" />
                     </template>
                     <v-list-item v-for="major in majors" :key="major.major_id" :title="major.name"
-                        :active="major.major_id == $route.params.major"
+                        :active="major.major_id == Number($route.params.major)"
                         @click="navigateTo(`/edit/${major.major_id}`)" />
                 </v-list-group>
             </v-list>
@@ -85,6 +85,13 @@
                 </v-row>
             </div>
         </v-main>
+
+        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success" variant="tonal">
+            提交成功
+        </v-snackbar>
+        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error" variant="tonal">
+            {{ errorPrompt }}
+        </v-snackbar>
     </v-layout>
 </template>
 
@@ -98,19 +105,32 @@ const validDel = ref(false);
 const del = ref({ school: "", major: "", reason: "" });
 const add = ref({ school: "", major: "", reason: "" });
 
+const successSnakebar = ref(false);
+const errorSnakebar = ref(false);
+const errorPrompt = ref("");
 
 const submitAdd = () => {
     $fetch("/api/majors/propose-add", {
         method: "POST",
-        params: add
-    })
+        body: add.value
+    }).then(() => {
+        successSnakebar.value = true;
+    }).catch((err) => {
+        errorPrompt.value = err.data.message;
+        errorSnakebar.value = true;
+    });
 };
 
 const submitDel = () => {
     $fetch("/api/majors/propose-del", {
         method: "POST",
-        params: del
-    })
+        body: del.value
+    }).then(() => {
+        successSnakebar.value = true;
+    }).catch((err) => {
+        errorPrompt.value = err.data.message;
+        errorSnakebar.value = true;
+    });
 };
 
 /**
@@ -145,7 +165,7 @@ const checkSchoolName = (v: string) => {
 const majorList = computed(() => {
     if (listItems.value) {
         return listItems.value.map((v) => v[1]).flat();
-    } 
+    }
     return [];
 });
 

@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     const users = await getCollection("docs");
 
     const data = await users
-        .find<CourseInfo>({ major_id: major, proposal: null })
+        .find<CourseInfo>({ major_id: Number(major), proposal: null })
         .toArray();
     return data;
 });

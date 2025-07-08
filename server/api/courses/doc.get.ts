@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     const users = await getCollection("docs");
     if (!course) {
         return {
-            major_id: "",
+            major_id: 0,
             grade: 0,
             course_name: "",
             direction: "",
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
         };
     }
     const data = await users.findOne<Course>({
-        major_id: major,
+        major_id: Number(major),
         course_id: Number(course),
         proposal: null,
     });
