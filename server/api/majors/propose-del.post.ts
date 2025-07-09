@@ -22,13 +22,15 @@ export default defineEventHandler(async (event) => {
     );
     
     const majors = await getCollection("majors");
-    const goal = await majors.findOne<{ _id: ObjectId }>({
+    const goal = await majors.findOne<{ _id: ObjectId, school: string}>({
         school,
-        major_id: major,
+        name: major,
     });
     if (!goal) throw createError({ statusCode: 403, message: "专业不存在" });
     majors.insertOne({
         del_id: goal._id,
-        proposal: { reason, user: validateUser.data.name, timestamp: timestamp() },
+        name: major,
+        school: goal.school,
+        proposal: { reason, user: validateUser.data.name, timestamp: timestamp(), accept: false },
     });
 });

@@ -1,13 +1,6 @@
 <template>
     <div ref="totalSpace" style="height: 100%;">
-        <v-breadcrumbs>
-            <v-breadcrumbs-item to="/edit">编辑专业</v-breadcrumbs-item>
-            <v-breadcrumbs-divider />
-            <v-breadcrumbs-item :to="`/edit/${$route.params.major}`">编辑课程</v-breadcrumbs-item>
-            <v-breadcrumbs-divider />
-            <v-breadcrumbs-item :disabled="true">编辑文档</v-breadcrumbs-item>
-        </v-breadcrumbs>
-        <v-row ref="row1Space" class="ml-1 mr-1">
+        <v-row ref="row1Space" class="ml-1 mr-1 mt-4">
             <v-col>
                 <v-text-field v-model="newCourse.course_name" variant="outlined" hide-details label="课程名称"
                     density="compact" />
@@ -79,7 +72,7 @@
                 </v-card>
             </v-col>
         </v-row>
-        <v-form v-model="linkValid">
+        <!-- <v-form v-model="linkValid">
             <v-row v-show="toggle == 'other'" justify="center" class="ml-1 mr-1">
                 <v-col>
                     <v-combobox v-model="link.school" label="学院" variant="solo-filled" :items="schools"
@@ -94,31 +87,30 @@
                         :loading="loadingCourses" :rules="[checkCourse]" />
                 </v-col>
             </v-row>
-        </v-form>
+        </v-form> -->
 
         <v-row v-show="toggle == 'unique'" ref="row3Space" class="ml-4 mr-4 mt-4">
             <v-combobox v-model="newCourse.teachers" chips multiple variant="outlined" density="compact" label="任课教师"
                 hide-details />
         </v-row>
-        <v-row ref="row4Space" class="ml-4 mr-4" justify="end">
-            <!-- <v-col> -->
-            <v-btn class="mt-2" :disabled="!infoValid || (toggle == 'other' && !linkValid)" color="primary"
-                variant="tonal" @click="submit">提交</v-btn>
-            <!-- </v-col> -->
+        <v-row  class="ml-4 mr-4" justify="end">
+            <v-col>
+                <v-text-field label="拒绝理由" hide-details density="compact" variant="underlined" ></v-text-field>
+            </v-col>
+            <v-col>
+                <v-btn color="error" block variant="tonal">拒绝</v-btn>
+            </v-col>
+            <v-spacer/>
+            <v-col>
+            <!-- <v-btn class="mt-2" :disabled="!infoValid || (toggle == 'other' && !linkValid)" color="primary"
+                variant="tonal" @click="submit">提交</v-btn> -->
+                <v-btn color="success" block variant="tonal">同意</v-btn>
+            </v-col>
         </v-row>
         <v-navigation-drawer location="right">
-            <v-progress-linear v-show="uploadProgress != 0" v-model="uploadProgress" color="primary" />
-
-            <v-file-input v-show="toggle == 'unique'" v-model="selectedFiles" label="上传附件" multiple show-size counter
-                variant="outlined" density="compact" class="ma-2" hide-details>
-                <template #append>
-                    <v-btn density="compact" icon="mdi-upload" class="ma-2" :disabled="selectedFiles.length == 0"
-                        @click="uploadFiles" />
-                </template>
-            </v-file-input>
             <v-divider />
             <v-list line="two">
-                <v-list-item v-for="(a, index) in totalAttachments" :key="index" :title="a.name" :subtitle="a.timestamp">
+                <v-list-item v-for="(a, index) in newAttachments" :key="index" :title="a.name" :subtitle="a.timestamp">
                     <template #append>
                         <v-btn icon="mdi-content-copy" variant="text" density="compact" @click="toClipboard(`/api/files/${a.file_id}`)"/>
                     </template>
@@ -138,19 +130,15 @@
 <script setup lang="ts">
 import type { VTabs } from 'vuetify/components';
 import type { VRow } from 'vuetify/components/VGrid';
-import axios from 'axios';
-import type { AxiosProgressEvent, AxiosResponse } from 'axios';
 import useClipboard  from "vue-clipboard3";
 
 const route = useRoute();
 const { toClipboard } = await useClipboard();
-const majorId = route.params.major;
 /**
  * 课程编号
  */
-const docId = route.params.doc;
+const docId = route.params.id;
 
-const props = defineProps<{ majors: Major[] }>();
 
 const tab = ref<"preview" | "editor">("editor");
 
@@ -159,7 +147,6 @@ const toggle = ref<"unique" | "other">("unique");
 const row1Space = ref<null | VRow>(null);
 const row2Space = ref<null | VRow>(null);
 const row3Space = ref<null | VRow>(null);
-const row4Space = ref<null | VRow>(null);
 const totalSpace = ref<null | HTMLDivElement>(null);
 
 /** 
@@ -173,8 +160,7 @@ onMounted(() => {
         const row1Height = row1Space.value?.$el.offsetHeight || 0;
         const row2Height = row2Space.value?.$el.offsetHeight || 0;
         const row3Height = row3Space.value?.$el.offsetHeight || 0;
-        const row4Height = row4Space.value?.$el.offsetHeight || 0;
-        editorHeight.value = totalHeight - row1Height * 1.5 - row2Height * 1.5 - row3Height * 1.5 - row4Height * 1.5;
+        editorHeight.value = totalHeight - row1Height * 1.5 - row2Height * 1.5 - row3Height * 1.5;
         editorHeight.value *= 0.9;
     });
 
@@ -182,54 +168,7 @@ onMounted(() => {
 
 const classNames = ["必修", "公共", "限选"];
 
-/**
- * 选择使用已有文档时对应的专业和课程
- */
-const link = ref({
-    school: "",
-    major: "",
-    course: "",
-})
 
-/**
- * 检查选择的学院是否正确
- */
-const checkSchool = (s: string) => {
-    if (props.majors.find(m => m.school == s))
-        return true;
-    return "没有这个学院";
-};
-
-const schools = computed(() => {
-    const l = props.majors.map(m => m.school);
-    return Array.from(new Set(l));
-});
-
-const getMajorId = (school: string, major: string) => {
-    const res = props.majors.find(m => m.name == major && m.school == school);
-    if (res)
-        return res.major_id;
-    return res;
-};
-
-/**
- * 检查使用已有文档时选择的专业是否在学院里
- */
-const checkMajorInSchool = (s: string) => {
-    if (props.majors.find(m => m.school == link.value.school && m.name == s))
-        return true;
-    return "没有这个专业";
-};
-
-const checkCourse = (s: string) => {
-    if (courseItems.value?.find(c => c == s))
-        return true;
-    return "没有这门课";
-}
-
-const majorOfSchool = computed(() => {
-    return props.majors.filter(m => m.school == link.value.school).map(m => m.name);
-})
 
 /**
  * 用户填写的年级
@@ -260,29 +199,15 @@ const newCourse = ref<Course>({
 /**
  * 获得当前选择课程的具体信息
  */
-const { data: course } = await useAsyncData(`major-${majorId}-${docId}`, () =>
+const { data: course } = await useAsyncData(`major-review-${docId}`, () =>
     $fetch<Course>("/api/courses/doc", {
         method: "GET",
         query: {
-            major: majorId,
-            course: docId == "new" ? undefined : docId
+            major: 0,
+            review_id: docId,
         }
     })
 );
-
-const infoValid = ref(false);
-const linkValid = ref(false);
-
-/**
- * 选择使用已有课程时，控制课程是否显示加载中。
- */
-const loadingCourses = ref(false);
-
-/**
- * 选择使用已有课程时，获得的对应专业课程列表。
- */
-const courseItems = ref<string[]>();
-
 
 const checkGrade = (s: string) => {
     if (gradeName.findIndex(v => v == s) != -1)
@@ -290,36 +215,6 @@ const checkGrade = (s: string) => {
     return "请选择具体学期或选择概述";
 };
 
-/**
- * 选择使用已有文档时，将专业课程的名称转换为对应 id。
- */
-const courseToId = new Map<string, number>();
-
-/**
- * 选择使用已有文档时，根据专业查询该专业课程。
- */
-const getCourses = () => {
-    const id = getMajorId(link.value.school, link.value.major);
-    if (id == undefined) {
-        link.value.course = "";
-        courseItems.value = [];
-        return;
-    }
-    loadingCourses.value = true;
-    $fetch("/api/courses", {
-        method: "GET",
-        query: {
-            major: id
-        }
-    }).then(res => {
-        courseToId.clear();
-        res.forEach(c => {
-            courseToId.set(c.course_name, c.course_id);
-        });
-        courseItems.value = res.map(c => c.course_name);
-        loadingCourses.value = false;
-    });
-};
 
 const successSnakebar = ref(false);
 const errorSnakebar = ref(false);
@@ -329,72 +224,28 @@ const submit = () => {
     const { proposal, ...data } = newCourse.value;
     if (toggle.value == "other") {
         data.doc_str = "";
-        data.link = {
-            major_id: getMajorId(link.value.school, link.value.major)!,
-            course_id: courseToId.get(link.value.course)!,
-        }
+        // data.link = {
+        //     major_id: getMajorId(link.value.school, link.value.major)!,
+        //     course_id: courseToId.get(link.value.course)!,
+        // }
     } else
         data.link = null;
 
-    $fetch("/api/courses/propose-update", {
-        method: "POST",
-        body: {
-            ...data,
-            newAttachments: newAttachments.value,
-        }
-    }).then(() => {
-        successSnakebar.value = true;
-    }).catch((err) => {
-        errorPrompt.value = err.data.message;
-        errorSnakebar.value = true;
-    });
+    // $fetch("/api/courses/propose-update", {
+    //     method: "POST",
+    //     body: {
+    //         ...data,
+    //         newAttachments: newAttachments.value,
+    //     }
+    // }).then(() => {
+    //     successSnakebar.value = true;
+    // }).catch((err) => {
+    //     errorPrompt.value = err.data.message;
+    //     errorSnakebar.value = true;
+    // });
 }
 
-
-const selectedFiles = ref<File[]>([]);
-const uploadProgress = ref(0);
-
-const uploadFiles = () => {
-    if (import.meta.client) {
-        const formData = new FormData();
-        selectedFiles.value.forEach((file) => {
-            formData.append('file', file);
-        });
-        axios.post('/api/files/upload', formData, {
-            onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
-                uploadProgress.value = percentCompleted;
-            }
-        }).then((res: AxiosResponse<{ resList: AttachmentInfo[] }>) => {
-            newAttachments.value = newAttachments.value.concat(res.data.resList);
-            uploadProgress.value = 0;
-            selectedFiles.value = [];
-        }).catch(err => {
-            errorPrompt.value = err;
-            errorSnakebar.value = true;
-        });
-    }
-};
-
-const { data: existAttachments } = useAsyncData(`attachments-${majorId}-${docId}`, () => 
-    $fetch<AttachmentInfo[]>("/api/files/info", {
-        method: "GET",
-        query: {
-            major_id: majorId,
-            course_id: docId,
-        }
-    })
-);
-
 const newAttachments = ref<AttachmentInfo[]>([]);
-
-/**
- * 已经过审的附件和现有附件的总和
- */
-const totalAttachments = computed(() => {
-    return newAttachments.value.toReversed().concat(existAttachments.value ?? []);
-});
-
 
 
 // 将选择的 grade 转换成对应编号。
@@ -409,12 +260,6 @@ watch(course, (newCourseData) => {
     if (newCourseData) {
         newCourse.value = newCourseData;
         grade.value = gradeName[newCourseData.grade];
-        if (newCourseData.link) {
-            const counter = props.majors.find(m => m.major_id == newCourseData.major_id);
-            if (counter)
-                link.value = { school: counter?.school, major: counter?.name, course: newCourseData.course_name };
-            toggle.value = "other";
-        }
     }
 }, { immediate: true });
 

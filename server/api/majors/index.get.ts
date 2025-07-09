@@ -7,7 +7,7 @@ const querySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-    const { accepted = false } = await querySchema.parseAsync(getQuery(event));;
+    const { accepted = false } = await querySchema.parseAsync(getQuery(event));
     const users = await getCollection("majors");
     let data: Major[];
     if (accepted == "true") {

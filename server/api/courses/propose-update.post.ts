@@ -32,7 +32,7 @@ const bodySchema = z.object({
 export default defineEventHandler(async (event) => {
     const { user } = await requireUserSession(event);
     const validateUser = SessionUserSchema.safeParse(user);
-    if (!validateUser.success) throw createError({ status: 401 });
+    if (!validateUser.success) throw createError({ statusCode: 401 });
 
     const query = await readValidatedBody(event, bodySchema.parse);
 

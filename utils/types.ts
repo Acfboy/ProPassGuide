@@ -5,23 +5,30 @@ export interface Major {
     major_id: number;
     name: string;
     school: string;
-    proposal: string | null;
+    proposal: Proposal | null;
 }
-
 
 /**
  * 课程概述信息，不含文档页具体显示内容和提交内容。
  */
 export interface CourseInfo {
+    _id: string,
     major_id: number;
     grade: number;
     course_name: string;
     direction: string;
-    proposal: null;
+    proposal: null | Proposal;
     credit: number;
     class: string;
     course_id: number;
     teachers: [];
+}
+
+export interface Proposal {
+    timestamp: string;
+    accept: boolean;
+    user: string;
+    reason: string;
 }
 
 /**
@@ -29,22 +36,17 @@ export interface CourseInfo {
  */
 export type Course = CourseInfo & {
     doc_str: string;
-    proposal: null | {
-        timestamp: string;
-        accept: boolean;
-        user: string;
-    };
     link: null | {
         major_id: number;
         course_id: number;
     };
+    del_id?: string,
 };
 
-export const SessionUserSchema = z
-    .object({
-        name: z.string(),
-    })
-    .passthrough();
+export const SessionUserSchema = z.object({
+    name: z.string(),
+    admin: z.boolean(),
+});
 
 export const gradeName = [
     "概览",
@@ -59,15 +61,24 @@ export const gradeName = [
 ];
 
 export interface AttachmentInfo {
-    file_id: string,
-    name: string,
-    timestamp: string,
+    file_id: string;
+    name: string;
+    timestamp: string;
 }
 
 export type Attachment = AttachmentInfo & {
-    major_id: number,
-    course_id: number,
-    proposal_id: ObjectId,
-    accept: boolean,
-    user: string,
-}
+    major_id: number;
+    course_id: number;
+    proposal_id: ObjectId;
+    accept: boolean;
+    user: string;
+};
+
+export type MajorProposal = {
+    _id: string,
+    major_id: number;
+    name: string;
+    school: string;
+    proposal: Proposal | null;
+    del_id?: string;
+};

@@ -29,13 +29,14 @@ export default defineEventHandler(async (event) => {
         .update(password + config.salt)
         .digest("hex");
     const users = await getCollection("users");
-    const data = await users.findOne<{ email: string; password: string }>(
+    const data = await users.findOne<{ email: string; password: string; admin:boolean }>(
         { email }
     );
     if (data && data.password === hashed) {
         await setUserSession(event, {
             user: {
                 name: email,
+                admin: data.admin
             },
         });
         return {

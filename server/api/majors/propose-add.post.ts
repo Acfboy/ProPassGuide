@@ -12,7 +12,7 @@ const bodySchema = z.object({
 export default defineEventHandler(async (event) => {
     const { user } = await requireUserSession(event);
     const validateUser = SessionUserSchema.safeParse(user);
-    if (!validateUser.success) throw createError({ status: 401 });
+    if (!validateUser.success) throw createError({ statusCode: 401, message: "未登录" });
     const { school, major, reason } = await readValidatedBody(
         event,
         bodySchema.parse
@@ -31,6 +31,6 @@ export default defineEventHandler(async (event) => {
         school,
         major_id: newId,
         name: major,
-        proposal: { reason, user, timestamp: timestamp() },
+        proposal: { reason, user: validateUser.data.name, timestamp: timestamp(), accept: false },
     });
 });
