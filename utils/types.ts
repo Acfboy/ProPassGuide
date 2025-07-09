@@ -1,3 +1,4 @@
+import type { ObjectId } from "mongodb";
 import z from "zod";
 
 export interface Major {
@@ -56,3 +57,17 @@ export const gradeName = [
     "大四秋",
     "大四春",
 ];
+
+export interface AttachmentInfo {
+    file_id: string,
+    name: string,
+    timestamp: string,
+}
+
+export type Attachment = AttachmentInfo & {
+    major_id: number,
+    course_id: number,
+    proposal_id: ObjectId,
+    accept: boolean,
+    user: string,
+}

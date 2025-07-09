@@ -20,6 +20,7 @@ export default defineNuxtConfig({
         mailHost: "",
         mailHostname: "",
         mailUser: "",
+        uploadDir: "",
         public: {
             requiredEmailDomain: "",
             siteTitle: "",

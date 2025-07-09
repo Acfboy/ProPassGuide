@@ -107,8 +107,23 @@
             <!-- </v-col> -->
         </v-row>
         <v-navigation-drawer location="right">
-            <v-file-input v-show="toggle == 'unique'" label="上传附件" variant="outlined" density="compact" class="ma-2" />
+            <v-progress-linear v-show="uploadProgress != 0" v-model="uploadProgress" color="primary" />
+
+            <v-file-input v-show="toggle == 'unique'" v-model="selectedFiles" label="上传附件" multiple show-size counter
+                variant="outlined" density="compact" class="ma-2" hide-details>
+                <template #append>
+                    <v-btn density="compact" icon="mdi-upload" class="ma-2" :disabled="selectedFiles.length == 0"
+                        @click="uploadFiles" />
+                </template>
+            </v-file-input>
             <v-divider />
+            <v-list line="two">
+                <v-list-item v-for="(a, index) in totalAttachments" :key="index" :title="a.name" :subtitle="a.timestamp">
+                    <template #append>
+                        <v-btn icon="mdi-content-copy" variant="text" density="compact" @click="toClipboard(`/api/files/${a.file_id}`)"/>
+                    </template>
+                </v-list-item>
+            </v-list>
         </v-navigation-drawer>
 
         <v-snackbar v-model="successSnakebar" :timeout="2000" color="success" variant="tonal">
@@ -123,9 +138,16 @@
 <script setup lang="ts">
 import type { VTabs } from 'vuetify/components';
 import type { VRow } from 'vuetify/components/VGrid';
+import axios from 'axios';
+import type { AxiosProgressEvent, AxiosResponse } from 'axios';
+import useClipboard  from "vue-clipboard3";
 
 const route = useRoute();
+const { toClipboard } = await useClipboard();
 const majorId = route.params.major;
+/**
+ * 课程编号
+ */
 const docId = route.params.doc;
 
 const props = defineProps<{ majors: Major[] }>();
@@ -152,8 +174,6 @@ onMounted(() => {
         const row2Height = row2Space.value?.$el.offsetHeight || 0;
         const row3Height = row3Space.value?.$el.offsetHeight || 0;
         const row4Height = row4Space.value?.$el.offsetHeight || 0;
-
-        console.log(`${row1Height} ${row2Height} ${row3Height}`)
         editorHeight.value = totalHeight - row1Height * 1.5 - row2Height * 1.5 - row3Height * 1.5 - row4Height * 1.5;
         editorHeight.value *= 0.9;
     });
@@ -317,7 +337,10 @@ const submit = () => {
 
     $fetch("/api/courses/propose-update", {
         method: "POST",
-        body: data
+        body: {
+            ...data,
+            newAttachments: newAttachments.value,
+        }
     }).then(() => {
         successSnakebar.value = true;
     }).catch((err) => {
@@ -325,6 +348,52 @@ const submit = () => {
         errorSnakebar.value = true;
     });
 }
+
+
+const selectedFiles = ref<File[]>([]);
+const uploadProgress = ref(0);
+
+const uploadFiles = () => {
+    if (!import.meta.client)
+        return;
+    const formData = new FormData();
+    selectedFiles.value.forEach((file) => {
+        formData.append('file', file);
+    });
+    axios.post('/api/files/upload', formData, {
+        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
+            uploadProgress.value = percentCompleted;
+        }
+    }).then((res: AxiosResponse<{ resList: AttachmentInfo[] }>) => {
+        newAttachments.value = newAttachments.value.concat(res.data.resList);
+        uploadProgress.value = 0;
+        selectedFiles.value = [];
+    }).catch(err => {
+        errorPrompt.value = err;
+        errorSnakebar.value = true;
+    });
+};
+
+const { data: existAttachments } = useAsyncData(`attachments-${majorId}-${docId}`, () => 
+    $fetch<AttachmentInfo[]>("/api/files/info", {
+        method: "GET",
+        query: {
+            major_id: majorId,
+            course_id: docId,
+        }
+    })
+);
+
+const newAttachments = ref<AttachmentInfo[]>([]);
+
+/**
+ * 已经过审的附件和现有附件的总和
+ */
+const totalAttachments = computed(() => {
+    return newAttachments.value.toReversed().concat(existAttachments.value ?? []);
+});
+
 
 
 // 将选择的 grade 转换成对应编号。
@@ -347,4 +416,5 @@ watch(course, (newCourseData) => {
         }
     }
 }, { immediate: true });
+
 </script>
