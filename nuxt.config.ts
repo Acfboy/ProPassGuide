@@ -9,7 +9,16 @@ export default defineNuxtConfig({
         "@nuxt/test-utils",
         "vuetify-nuxt-module",
         "nuxt-auth-utils",
+        "@nuxtjs/mdc",
     ],
+
+    mdc: {
+        // @ts-expect-error extendMarkdownIt is supported at runtime
+        extendMarkdownIt(md) {
+            // 禁用 anchor 插件，防止标题变成超链接
+            md.core.ruler.disable('anchor');
+        }
+    },
 
     runtimeConfig: {
         mongoDbUrl: "",
@@ -21,6 +30,8 @@ export default defineNuxtConfig({
         public: {
             requiredEmailDomain: "",
             siteTitle: "",
+            footerCopyright: "",
+            footerNote: ""
         },
     },
 });
