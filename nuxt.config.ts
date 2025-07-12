@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
     compatibilityDate: "2025-05-15",
-    devtools: { enabled: true },
+    devtools: { enabled: false },
 
     modules: [
         "@nuxt/eslint",
@@ -9,6 +9,7 @@ export default defineNuxtConfig({
         "@nuxt/test-utils",
         "vuetify-nuxt-module",
         "nuxt-auth-utils",
+        "nuxt-monaco-editor",
         "@nuxtjs/mdc",
     ],
 
@@ -27,11 +28,16 @@ export default defineNuxtConfig({
         mailHost: "",
         mailHostname: "",
         mailUser: "",
+        uploadDir: "",
         public: {
             requiredEmailDomain: "",
             siteTitle: "",
             footerCopyright: "",
             footerNote: ""
         },
+    },
+    monacoEditor: {
+        locale: "zh-hans",
+        removeSourceMaps: true,
     },
 });

@@ -40,6 +40,7 @@
 import TopTabs from '~/components/TopTabs.vue';
 // import Sidebar from '~/components/Sidebar.vue';
 const config = useRuntimeConfig();
+<<<<<<< HEAD
 
 const route = useRoute();
 const router = useRouter();

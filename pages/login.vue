@@ -60,11 +60,12 @@ const login = async () => {
         })
         if (res.status == "ok") {
             await refreshSession();
-            const router = useRouter();
-            if (window.history.state.back)
-                router.go(-1);
+            const route = useRoute();
+            const redirectPath = route.query.redirect;
+            if (typeof redirectPath == 'string')
+                navigateTo(redirectPath);
             else
-                router.replace({ path: '/' })
+                navigateTo("/");
         } else {
             prompt.value = res.message;
         }

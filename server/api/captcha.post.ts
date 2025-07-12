@@ -1,5 +1,5 @@
 import { z } from "zod";
-import clientPromise from "~/server/db/mongodb";
+import { getCollection } from "~/server/db/mongodb";
 import { validateEmail, validateEmailDomain } from "~/utils/validation";
 import transporter from "../mailer";
 
@@ -18,9 +18,7 @@ export default defineEventHandler(async (event) => {
         };
     }
 
-    const client = await clientPromise;
-    const db = client.db("ProPassGuide");
-    const users = db.collection("users");
+    const users = await getCollection("users");
 
     const captcha = Math.floor(Math.random() * 900000 + 100000);
     const query = { email };
