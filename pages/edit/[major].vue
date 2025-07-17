@@ -109,8 +109,10 @@ const proposeDelete = () => {
         })
 };
 
+const requestFetch = useRequestFetch();
+
 const { data: listItems } = await useAsyncData(`major-${majorId}`, () =>
-    $fetch<CourseInfo[]>("/api/courses", {
+    requestFetch<CourseInfo[]>("/api/courses", {
         method: "GET",
         query: {
             major: majorId

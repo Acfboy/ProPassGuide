@@ -6,10 +6,13 @@ export default defineEventHandler(async (event) => {
     const validateUser = SessionUserSchema.safeParse(user);
     if (!validateUser.success || !validateUser.data.admin)
         throw createError({ statusCode: 401 });
-    const docs    = await getCollection("docs");
+    const docs = await getCollection("docs");
 
     const data = await docs
-        .find({ "proposal.accept": false }, { projection: { doc_str: 0 } })
+        .find(
+            { "proposal.accept": false, deleted: { $ne: true } },
+            { projection: { doc_str: 0 } }
+        )
         .toArray();
     return data;
 });

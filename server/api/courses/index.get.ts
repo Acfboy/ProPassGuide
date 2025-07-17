@@ -8,11 +8,11 @@ const querySchema = z.object({
 
 export default defineEventHandler(async (event) => {
     const { major } = await querySchema.parseAsync(getQuery(event));
-    const users = await getCollection("docs");
+    const docs = await getCollection("docs");
 
-    const data = await users
+    const data = await docs
         .find<CourseInfo>(
-            { major_id: Number(major), proposal: null },
+            { major_id: Number(major), proposal: null, deleted: { $ne: true } },
             { projection: { doc_str: 0, proposal: 0, link: 0 } }
         )
         .toArray();

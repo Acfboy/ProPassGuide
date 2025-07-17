@@ -1,54 +1,56 @@
 <template>
     <div ref="totalSpace" style="height: 100%;">
+        {{ errorPrompt }}
         <v-row ref="row1Space" class="ml-1 mr-1 mt-4">
             <v-col>
-                <v-text-field v-model="newCourse.course_name" variant="outlined" hide-details label="课程名称"
-                    density="compact" />
+                <v-text-field v-if="proposalWithDoc" v-model="proposalWithDoc.proposal.course_name" variant="outlined"
+                    label="课程名称" density="compact" persistent-hint :hint="proposalWithDoc.oriDoc.course_name" />
             </v-col>
             <v-col>
-                <v-btn-toggle v-model="toggle" divided>
-                    <v-btn value="unique">
-                        <span class="hidden-sm-and-down">独立页面</span>
+                <v-alert v-if="proposalWithDoc && proposalWithDoc.proposal.del_id" type="warning" variant="outlined"
+                    density="compact">
+                    用户想要删除这份文档
+                </v-alert>
+                <v-alert v-if="proposalWithDoc && proposalWithDoc.oriDoc.major_id == 0" type="info" variant="outlined"
+                    density="compact">
+                    用户新建了这份文档
+                </v-alert>
+                <v-alert
+                    v-else-if="proposalWithDoc && (proposalWithDoc.oriDoc.link == null) != (proposalWithDoc.proposal.link == null)"
+                    type="warning" variant="outlined" density="compact">
+                    用户切换了文档类型（独立文档/引用其它文档）。
+                </v-alert>
 
-                        <v-icon end>
-                            mdi-format-align-left
-                        </v-icon>
-                    </v-btn>
 
-                    <v-btn value="other">
-                        <span class="hidden-sm-and-down">使用已有文档</span>
-
-                        <v-icon end>
-                            mdi-open-in-new
-                        </v-icon>
-                    </v-btn>
-                </v-btn-toggle>
             </v-col>
         </v-row>
-        <v-form v-model="infoValid">
+        <v-form v-if="proposalWithDoc" v-model="infoValid">
             <v-row ref="row2Space" class="ml-1 mr-1 ">
                 <v-col>
-                    <v-number-input v-model="newCourse.credit" :precision="1" :step="0.5" control-variant="split"
-                        label="学分" :hide-input="false" :inset="false" variant="outlined" density="compact" />
+                    <v-number-input v-model="proposalWithDoc.proposal.credit" :precision="1" :step="0.5"
+                        control-variant="split" label="学分" :hide-input="false" :inset="false" variant="outlined"
+                        density="compact" perisistent-hint :hint="String(proposalWithDoc.oriDoc.credit)"
+                        persistent-hint />
                 </v-col>
 
                 <v-col>
-                    <v-combobox v-model="newCourse.class" :items="classNames" variant="outlined" density="compact"
-                        label="类型" />
+                    <v-combobox v-model="proposalWithDoc.proposal.class" :items="classNames" variant="outlined"
+                        :hint="proposalWithDoc.oriDoc.class" density="compact" label="类型" persistent-hint />
                 </v-col>
 
                 <v-col>
                     <v-combobox v-model="grade" :items="gradeName" variant="outlined" density="compact" label="年级"
-                        :rules="[checkGrade]" />
+                        :rules="[checkGrade]" :hint="gradeName[proposalWithDoc.oriDoc.grade]" persistent-hint />
                 </v-col>
 
                 <v-col>
-                    <v-text-field v-model="newCourse.direction" variant="outlined" label="专业方向" hint="不区分方向则留空"
-                        density="compact" />
+                    <v-text-field v-model="proposalWithDoc.proposal.direction" variant="outlined" label="专业方向"
+                        density="compact" :hint="proposalWithDoc.oriDoc.direction" persistent-hint />
                 </v-col>
             </v-row>
         </v-form>
-        <v-row v-show="toggle == 'unique'" justify="center" class="ml-1 mr-1">
+        <v-row v-if="proposalWithDoc && !proposalWithDoc.proposal.link && !proposalWithDoc.proposal.del_id"
+            justify="center" class="ml-1 mr-1">
             <v-col>
                 <v-card class="flex-grow-1">
                     <v-tabs v-model="tab" bg-color="primary" density="compact">
@@ -58,13 +60,14 @@
                     <v-card-text>
                         <v-tabs-window v-model="tab">
                             <v-tabs-window-item value="editor">
-                                <MonacoEditor v-model="newCourse.doc_str" :style="`height: ${editorHeight}px`"
+                                <MonacoDiffEditor v-model="proposalWithDoc.proposal.doc_str"
+                                    :original="proposalWithDoc.oriDoc.doc_str" :style="`height: ${editorHeight}px`"
                                     lang="markdown" />
                             </v-tabs-window-item>
 
                             <v-tabs-window-item value="preview" class="overflow-x-auto"
                                 :style="`height: ${editorHeight}px`">
-                                <MDC :value="newCourse?.doc_str" />
+                                <MDC :value="proposalWithDoc.proposal.doc_str" />
                             </v-tabs-window-item>
 
                         </v-tabs-window>
@@ -72,47 +75,48 @@
                 </v-card>
             </v-col>
         </v-row>
-        <!-- <v-form v-model="linkValid">
-            <v-row v-show="toggle == 'other'" justify="center" class="ml-1 mr-1">
-                <v-col>
-                    <v-combobox v-model="link.school" label="学院" variant="solo-filled" :items="schools"
-                        :rules="[checkSchool]" @update:model-value="getCourses" />
-                </v-col>
-                <v-col>
-                    <v-combobox v-model="link.major" label="专业" variant="solo-filled" :items="majorOfSchool"
-                        :rules="[checkMajorInSchool]" @update:model-value="getCourses" />
-                </v-col>
-                <v-col>
-                    <v-combobox v-model="link.course" label="课程" variant="solo-filled" :items="courseItems"
-                        :loading="loadingCourses" :rules="[checkCourse]" />
-                </v-col>
-            </v-row>
-        </v-form> -->
-
-        <v-row v-show="toggle == 'unique'" ref="row3Space" class="ml-4 mr-4 mt-4">
-            <v-combobox v-model="newCourse.teachers" chips multiple variant="outlined" density="compact" label="任课教师"
-                hide-details />
+        <v-row v-if="proposalWithDoc && proposalWithDoc.proposal.link && !proposalWithDoc.proposal.del_id"
+            justify="center" class="ml-1 mr-1">
+            <button v-if="proposalWithDoc.oriDoc.link"
+                :to="`/docs/${proposalWithDoc.oriDoc.link.major_id}/${proposalWithDoc.oriDoc.link.course_id}`">
+                查看原先指向的页面
+            </button>
+            <button class="ml-2"
+                :to="`/docs/${proposalWithDoc.proposal.link.major_id}/${proposalWithDoc.proposal.link.course_id}`">
+                查看更新后指向的页面
+            </button>
         </v-row>
-        <v-row  class="ml-4 mr-4" justify="end">
+        <v-row v-if="proposalWithDoc && proposalWithDoc.proposal.del_id">
+            <button class="ma-2"
+                :to="`/docs/${proposalWithDoc.proposal.major_id}/${proposalWithDoc.proposal.course_id}`">
+                查看要删除的页面
+            </button>
+        </v-row>
+
+        <v-row v-if="proposalWithDoc && !proposalWithDoc.proposal.link" ref="row3Space" class="ml-4 mr-4 mt-4">
+            <v-combobox v-model="proposalWithDoc.proposal.teachers" chips multiple variant="outlined" density="compact"
+                label="任课教师" :hint="JSON.stringify(proposalWithDoc.oriDoc.teachers)" persistent-hint />
+        </v-row>
+        <v-row class="ml-4 mr-4" justify="end">
             <v-col>
-                <v-text-field label="拒绝理由" hide-details density="compact" variant="underlined" ></v-text-field>
+                <v-text-field label="拒绝理由" hide-details v-model="reason" density="compact" variant="underlined" />
             </v-col>
             <v-col>
-                <v-btn color="error" block variant="tonal">拒绝</v-btn>
+                <v-btn color="error" block variant="tonal" @click="submit(reason)">拒绝</v-btn>
             </v-col>
-            <v-spacer/>
+            <v-spacer />
             <v-col>
-            <!-- <v-btn class="mt-2" :disabled="!infoValid || (toggle == 'other' && !linkValid)" color="primary"
-                variant="tonal" @click="submit">提交</v-btn> -->
-                <v-btn color="success" block variant="tonal">同意</v-btn>
+                <v-btn color="success" block variant="tonal" @click="submit(true)">同意</v-btn>
             </v-col>
         </v-row>
         <v-navigation-drawer location="right">
-            <v-divider />
             <v-list line="two">
+                <v-list-subheader>新增附件</v-list-subheader>
                 <v-list-item v-for="(a, index) in newAttachments" :key="index" :title="a.name" :subtitle="a.timestamp">
                     <template #append>
-                        <v-btn icon="mdi-content-copy" variant="text" density="compact" @click="toClipboard(`/api/files/${a.file_id}`)"/>
+                        <v-btn icon="mdi-content-copy" variant="text" density="compact"
+                            @click="toClipboard(`/api/files/${a.file_id}`)" />
+                        <v-btn icon="mdi-download" variant="text" density="compact" :href="`/api/files/${a.file_id}`" />
                     </template>
                 </v-list-item>
             </v-list>
@@ -130,19 +134,18 @@
 <script setup lang="ts">
 import type { VTabs } from 'vuetify/components';
 import type { VRow } from 'vuetify/components/VGrid';
-import useClipboard  from "vue-clipboard3";
+import useClipboard from "vue-clipboard3";
 
 const route = useRoute();
-const { toClipboard } = await useClipboard();
+const { toClipboard } = useClipboard();
+
 /**
- * 课程编号
+ * 文档更新申请编号
  */
-const docId = route.params.id;
+const proposalId = route.params.id;
 
 
 const tab = ref<"preview" | "editor">("editor");
-
-const toggle = ref<"unique" | "other">("unique");
 
 const row1Space = ref<null | VRow>(null);
 const row2Space = ref<null | VRow>(null);
@@ -168,7 +171,10 @@ onMounted(() => {
 
 const classNames = ["必修", "公共", "限选"];
 
-
+/**
+ * 更新的内容是否合法
+ */
+const infoValid = ref(false);
 
 /**
  * 用户填写的年级
@@ -176,37 +182,25 @@ const classNames = ["必修", "公共", "限选"];
  */
 const grade = ref("");
 
-/**
- * 要申请的课程信息
- * @note 一些值因为绑定不符合最终格式，在发送请求的时候要修改。
- */
-const newCourse = ref<Course>({
-    major_id: 0,
-    grade: 0,
-    course_name: "",
-    direction: "",
-    proposal: null,
-    credit: 0,
-    class: "",
-    course_id: 0,
-    doc_str: "",
-    link: null,
-    teachers: [],
-    _id: ""
-});
-
+const requestFetch = useRequestFetch();
 
 /**
- * 获得当前选择课程的具体信息
+ * 获得申请内容和原来的文档
  */
-const { data: course } = await useAsyncData(`major-review-${docId}`, () =>
-    $fetch<Course>("/api/courses/doc", {
+const { data: proposalWithDoc } = await useAsyncData(`major-review-${proposalId}`, () =>
+    requestFetch<{ proposal: CourseWithDbId, oriDoc: Course }>("/api/courses/proposal-with-doc", {
         method: "GET",
         query: {
-            major: 0,
-            review_id: docId,
+            review_id: proposalId,
         }
+    }).then((res) => {
+        grade.value = gradeName[res.proposal.grade];
+        return res;
     })
+        .catch((err) => {
+            console.log(err);
+            errorPrompt.value = err;
+        })
 );
 
 const checkGrade = (s: string) => {
@@ -215,52 +209,73 @@ const checkGrade = (s: string) => {
     return "请选择具体学期或选择概述";
 };
 
-
 const successSnakebar = ref(false);
 const errorSnakebar = ref(false);
 const errorPrompt = ref("");
 
-const submit = () => {
-    const { proposal, ...data } = newCourse.value;
-    if (toggle.value == "other") {
-        data.doc_str = "";
-        // data.link = {
-        //     major_id: getMajorId(link.value.school, link.value.major)!,
-        //     course_id: courseToId.get(link.value.course)!,
-        // }
-    } else
-        data.link = null;
-
-    // $fetch("/api/courses/propose-update", {
-    //     method: "POST",
-    //     body: {
-    //         ...data,
-    //         newAttachments: newAttachments.value,
-    //     }
-    // }).then(() => {
-    //     successSnakebar.value = true;
-    // }).catch((err) => {
-    //     errorPrompt.value = err.data.message;
-    //     errorSnakebar.value = true;
-    // });
-}
-
-const newAttachments = ref<AttachmentInfo[]>([]);
-
+const { data: newAttachments } = useAsyncData(`proposal-new-attach-${proposalId}`, () =>
+    requestFetch<AttachmentInfo[]>("/api/files/with-proposal", {
+        method: "GET",
+        query: {
+            proposal_id: proposalId,
+        }
+    })
+)
 
 // 将选择的 grade 转换成对应编号。
 watch(grade, () => {
     const index = gradeName.findIndex(s => s == grade.value);
-    if (index != -1)
-        newCourse.value.grade = index;
+    if (index != -1 && proposalWithDoc.value)
+        proposalWithDoc.value.proposal.grade = index;
 });
 
-// 获得课程信息后更新申请课程信息
-watch(course, (newCourseData) => {
-    if (newCourseData) {
-        newCourse.value = newCourseData;
-        grade.value = gradeName[newCourseData.grade];
-    }
-}, { immediate: true });
+const reason = ref("");
 
+const submit = (accept: string | true) => {
+    if (!proposalWithDoc.value) {
+        errorPrompt.value = "提交失败";
+        errorSnakebar.value = true;
+        return;
+    }
+
+    if (proposalWithDoc.value?.proposal.del_id) {
+        $fetch("/api/courses/apply-del", {
+            method: "POST",
+            body: {
+                id: proposalWithDoc.value.proposal.del_id,
+                proposal_id: proposalWithDoc.value.proposal._id,
+                accept,
+            }
+        }).then(() => {
+            successSnakebar.value = true;
+        }).catch((err) => {
+            errorPrompt.value = err.data.message;
+            errorSnakebar.value = true;
+        });
+    } else {
+        const data = proposalWithDoc.value.proposal;
+        $fetch("/api/courses/apply-update", {
+            method: "POST",
+            body: {
+                major_id: data.major_id,
+                grade: data.grade,
+                course_name: data.course_name,
+                direction: data.direction,
+                doc_str: data.doc_str,
+                course_id: data.course_id,
+                teachers: data.teachers,
+                link: data.link,
+                credit: data.credit,
+                class: data.class,
+                proposal_id: data._id,
+                accept,
+            }
+        }).then(() => {
+            successSnakebar.value = true;
+        }).catch((err) => {
+            errorPrompt.value = err.data.message;
+            errorSnakebar.value = true;
+        });
+    }
+}
 </script>

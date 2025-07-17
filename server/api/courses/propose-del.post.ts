@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { getCollection } from "~/server/db/mongodb";
 import { timestamp } from "~/utils/tools";
-import type { CourseInfo} from "~/utils/types";
+import type { CourseWithDbId} from "~/utils/types";
 import { SessionUserSchema } from "~/utils/types";
 
 const bodySchema = z.object({
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
         bodySchema.parse
     );
     const docs = await getCollection("docs");
-    const goal = await docs.findOne<CourseInfo>({
+    const goal = await docs.findOne<CourseWithDbId>({
         course_name,
         major_id: Number(major_id),
         proposal: null,

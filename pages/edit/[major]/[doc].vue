@@ -139,8 +139,9 @@
 import type { VTabs } from 'vuetify/components';
 import type { VRow } from 'vuetify/components/VGrid';
 import axios from 'axios';
-import type { AxiosProgressEvent, AxiosResponse } from 'axios';
+import type { AxiosResponse } from 'axios';
 import useClipboard  from "vue-clipboard3";
+import type { CourseWithDbId } from '~/utils/types';
 
 const route = useRoute();
 const { toClipboard } = await useClipboard();
@@ -241,7 +242,7 @@ const grade = ref("");
  * 要申请的课程信息
  * @note 一些值因为绑定不符合最终格式，在发送请求的时候要修改。
  */
-const newCourse = ref<Course>({
+const newCourse = ref<CourseWithDbId>({
     major_id: 0,
     grade: 0,
     course_name: "",
@@ -256,12 +257,13 @@ const newCourse = ref<Course>({
     _id: ""
 });
 
+const requestFetch = useRequestFetch();
 
 /**
  * 获得当前选择课程的具体信息
  */
 const { data: course } = await useAsyncData(`major-${majorId}-${docId}`, () =>
-    $fetch<Course>("/api/courses/doc", {
+    requestFetch<CourseWithDbId>("/api/courses/doc", {
         method: "GET",
         query: {
             major: majorId,
@@ -361,7 +363,7 @@ const uploadFiles = () => {
             formData.append('file', file);
         });
         axios.post('/api/files/upload', formData, {
-            onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+            onUploadProgress: (progressEvent) => {
                 const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
                 uploadProgress.value = percentCompleted;
             }
@@ -377,7 +379,7 @@ const uploadFiles = () => {
 };
 
 const { data: existAttachments } = useAsyncData(`attachments-${majorId}-${docId}`, () => 
-    $fetch<AttachmentInfo[]>("/api/files/info", {
+    requestFetch<AttachmentInfo[]>("/api/files/info", {
         method: "GET",
         query: {
             major_id: majorId,

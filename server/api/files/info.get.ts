@@ -11,9 +11,9 @@ export default defineEventHandler(async (event) => {
     const { course_id, major_id } = await querySchema.parseAsync(
         getQuery(event)
     );
-    const users = await getCollection("attachments");
+    const attachments = await getCollection("attachments");
 
-    const data = await users
+    const data = await attachments
         .find<AttachmentInfo>(
             { course_id, major_id, accept: true },
             { projection: { file_id: 1, timestamp: 1, name: 1 } }

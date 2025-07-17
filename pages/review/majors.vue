@@ -60,9 +60,11 @@
 </template>
 
 <script setup lang="ts">
+const requestFetch = useRequestFetch();
+
 const { data: majorProposals } = useAsyncData(
     "major-proposals",
-    () => $fetch<MajorProposal[]>("/api/majors/proposals", { method: "GET" })
+    () => requestFetch<MajorProposal[]>("/api/majors/proposals", { method: "GET" })
 );
 
 const successSnakebar = ref(false);
@@ -71,7 +73,6 @@ const errorPrompt = ref("");
 
 const operateProposal = async (index: number, accept: boolean) => {
     const cur = majorProposals.value?.at(index);
-    console.log(cur)
     if (cur?.del_id) {
         await $fetch("/api/majors/apply-del", {
             method: "POST",

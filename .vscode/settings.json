@@ -1,4 +1,4 @@
 {
     "editor.indentSize": "tabSize",
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    "editor.defaultFormatter": null
 }

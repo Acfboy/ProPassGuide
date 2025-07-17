@@ -100,6 +100,8 @@ definePageMeta({
     middleware: ['auth']
 });
 
+const requestFetch = useRequestFetch();
+
 const validAdd = ref(false);
 const validDel = ref(false);
 const del = ref({ school: "", major: "", reason: "" });
@@ -169,8 +171,9 @@ const majorList = computed(() => {
     return [];
 });
 
+
 const { data: listItems } = await useAsyncData("majors", () =>
-    $fetch<Major[]>("/api/majors", {
+    requestFetch<Major[]>("/api/majors", {
         method: "GET",
         query: {
             accepted: true

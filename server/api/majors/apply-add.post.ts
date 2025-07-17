@@ -23,7 +23,6 @@ export default defineEventHandler(async (event) => {
 
     const majors = await getCollection("majors");
     if (accept === true) {
-        console.log(11);
         const origin = await majors.findOne<Major>({
             _id: new ObjectId(proposal_id),
         });

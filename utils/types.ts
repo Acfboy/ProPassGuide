@@ -12,7 +12,6 @@ export interface Major {
  * 课程概述信息，不含文档页具体显示内容和提交内容。
  */
 export interface CourseInfo {
-    _id: string,
     major_id: number;
     grade: number;
     course_name: string;
@@ -21,7 +20,11 @@ export interface CourseInfo {
     credit: number;
     class: string;
     course_id: number;
-    teachers: [];
+    teachers: string[];
+}
+
+export type CourseWithDbId = Course & {
+    _id: string,
 }
 
 export interface Proposal {
@@ -41,6 +44,7 @@ export type Course = CourseInfo & {
         course_id: number;
     };
     del_id?: string,
+    deleted?: boolean,
 };
 
 export const SessionUserSchema = z.object({

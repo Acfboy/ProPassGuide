@@ -46,8 +46,12 @@
 </template>
 
 <script setup lang="ts">
+import type { CourseWithDbId } from '~/utils/types';
+
+const requestFetch = useRequestFetch();
+
 const { data: majorItems } = await useAsyncData("majors", () =>
-    $fetch<Major[]>("/api/majors", {
+    requestFetch<Major[]>("/api/majors", {
         method: "GET",
         query: {
             accepted: true
@@ -74,54 +78,11 @@ watchEffect(() => {
 
 const { data: courseProposals } = useAsyncData(
     "course-proposals",
-    () => $fetch<Course[]>("/api/courses/proposals", { method: "GET" })
+    () => requestFetch<CourseWithDbId[]>("/api/courses/proposals", { method: "GET" })
 );
 
 const successSnakebar = ref(false);
 const errorSnakebar = ref(false);
 const errorPrompt = ref("");
 
-// const operateProposal = async (index: number, accept: boolean) => {
-//     const cur = majorProposals.value?.at(index);
-//     console.log(cur)
-//     if (cur?.del_id) {
-//         await $fetch("/api/majors/apply-del", {
-//             method: "POST",
-//             body: {
-//                 id: cur.del_id,
-//                 proposal_id: cur._id,
-//                 accept,
-//                 reason: cur.proposal?.reason,
-//             }
-//         })
-//             .then(() => {
-//                 successSnakebar.value = true;
-//             })
-//             .catch((err) => {
-//                 errorPrompt.value = err.data.message;
-//                 errorSnakebar.value = true;
-//             })
-
-//     }
-//     else if (cur) {
-//         await $fetch("/api/majors/apply-add", {
-//             method: "POST",
-//             body: {
-//                 proposal_id: cur._id,
-//                 accept,
-//                 reason: cur.proposal?.reason,
-//             }
-//         })
-//             .then(() => {
-//                 successSnakebar.value = true;
-//             })
-//             .catch((err) => {
-//                 errorPrompt.value = err.data.message;
-//                 errorSnakebar.value = true;
-//             })
-
-//     }
-
-//     majorProposals.value?.splice(index, 1);
-// }
 </script>

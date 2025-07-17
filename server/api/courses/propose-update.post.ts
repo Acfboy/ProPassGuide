@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { getCollection } from "~/server/db/mongodb";
 import { timestamp } from "~/utils/tools";
-import type { Attachment} from "~/utils/types";
-import  { SessionUserSchema } from "~/utils/types";
+import type { Attachment } from "~/utils/types";
+import { SessionUserSchema } from "~/utils/types";
 
 const LinkObjectSchema = z.object({
     major_id: z.string(),
@@ -13,7 +13,7 @@ const AttachmentInfoSchema = z.object({
     file_id: z.string(),
     name: z.string(),
     timestamp: z.string(),
-})
+});
 
 const bodySchema = z.object({
     major_id: z.number(),
@@ -26,7 +26,7 @@ const bodySchema = z.object({
     link: z.union([LinkObjectSchema, z.null()]),
     credit: z.number(),
     class: z.string(),
-    newAttachments: z.array(AttachmentInfoSchema)
+    newAttachments: z.optional(z.array(AttachmentInfoSchema)),
 });
 
 export default defineEventHandler(async (event) => {
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
 
     const query = await readValidatedBody(event, bodySchema.parse);
 
-    const majors = await getCollection("docs");
+    const docs = await getCollection("docs");
     const data = {
         proposal: {
             timestamp: timestamp(),
@@ -45,15 +45,24 @@ export default defineEventHandler(async (event) => {
         },
         ...query,
     };
-    const id = (await majors.insertOne(data)).insertedId;
+    if ("newAttachments" in data) delete data.newAttachments;
 
-    const attachments = await getCollection("attachments");
-    attachments.insertMany(query.newAttachments.map(a => ({
-        ...a,
-        proposal_id: id,
-        major_id: query.major_id,
-        course_id: query.course_id,
-        user: validateUser.data.name,
-        accept: false
-    } as Attachment)))
+    const id = (await docs.insertOne(data)).insertedId;
+
+    if (query.newAttachments) {
+        const attachments = await getCollection("attachments");
+        attachments.insertMany(
+            query.newAttachments.map(
+                (a) =>
+                    ({
+                        ...a,
+                        proposal_id: id,
+                        major_id: query.major_id,
+                        course_id: query.course_id,
+                        user: validateUser.data.name,
+                        accept: false,
+                    } as Attachment)
+            )
+        );
+    }
 });
