@@ -11,6 +11,7 @@ export default defineNuxtConfig({
         "nuxt-auth-utils",
         "nuxt-monaco-editor",
         "@nuxtjs/mdc",
+        "nuxt-mathjax",
     ],
 
     runtimeConfig: {
@@ -24,10 +25,21 @@ export default defineNuxtConfig({
         public: {
             requiredEmailDomain: "",
             siteTitle: "",
+            footerCopyright: "",
+            footerNote: "",
         },
     },
+
     monacoEditor: {
         locale: "zh-hans",
         removeSourceMaps: true,
+    },
+    mdc: {
+        remarkPlugins: {
+            "remark-math": {},
+        },
+        rehypePlugins: {
+            "rehype-mathjax": {},
+        }
     },
 });

@@ -99,7 +99,7 @@
         </v-row>
         <v-row class="ml-4 mr-4" justify="end">
             <v-col>
-                <v-text-field label="拒绝理由" hide-details v-model="reason" density="compact" variant="underlined" />
+                <v-text-field v-model="reason" label="拒绝理由" hide-details density="compact" variant="underlined" />
             </v-col>
             <v-col>
                 <v-btn color="error" block variant="tonal" @click="submit(reason)">拒绝</v-btn>
@@ -187,7 +187,7 @@ const requestFetch = useRequestFetch();
 /**
  * 获得申请内容和原来的文档
  */
-const { data: proposalWithDoc } = await useAsyncData(`major-review-${proposalId}`, () =>
+const { data: proposalWithDoc, error } = await useAsyncData(`major-review-${proposalId}`, () =>
     requestFetch<{ proposal: CourseWithDbId, oriDoc: Course }>("/api/courses/proposal-with-doc", {
         method: "GET",
         query: {
@@ -197,11 +197,12 @@ const { data: proposalWithDoc } = await useAsyncData(`major-review-${proposalId}
         grade.value = gradeName[res.proposal.grade];
         return res;
     })
-        .catch((err) => {
-            console.log(err);
-            errorPrompt.value = err;
-        })
 );
+
+if (error.value) {
+    console.log(error.value.data);
+    throw showError({ statusCode: error.value.statusCode, statusMessage: (error.value.data as { message: string }).message as string });
+}
 
 const checkGrade = (s: string) => {
     if (gradeName.findIndex(v => v == s) != -1)
@@ -221,6 +222,7 @@ const { data: newAttachments } = useAsyncData(`proposal-new-attach-${proposalId}
         }
     })
 )
+
 
 // 将选择的 grade 转换成对应编号。
 watch(grade, () => {
@@ -248,6 +250,7 @@ const submit = (accept: string | true) => {
             }
         }).then(() => {
             successSnakebar.value = true;
+            navigateTo("/review/docs");
         }).catch((err) => {
             errorPrompt.value = err.data.message;
             errorSnakebar.value = true;
@@ -272,6 +275,7 @@ const submit = (accept: string | true) => {
             }
         }).then(() => {
             successSnakebar.value = true;
+            navigateTo("/review/docs");
         }).catch((err) => {
             errorPrompt.value = err.data.message;
             errorSnakebar.value = true;

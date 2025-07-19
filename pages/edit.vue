@@ -1,5 +1,5 @@
 <template>
-    <v-layout>
+    <v-main>
         <v-navigation-drawer permanent>
             <v-list>
                 <v-list-group v-for="[school, majors] in listItems" :key="school" :value="school">
@@ -12,79 +12,77 @@
                 </v-list-group>
             </v-list>
         </v-navigation-drawer>
-        <v-main fill-height>
-            <NuxtPage :majors="majorList" />
+        <NuxtPage :majors="majorList" />
 
-            <div v-if="$route.params.major == undefined">
-                <v-breadcrumbs :items="['编辑专业']" />
-                <v-row justify="center">
-                    <v-col cols="12" md="6" lg="4" xl="4">
-                        <v-card title="申请添加专业" variant="outlined">
-                            <v-card-text>
-                                <v-form v-model="validAdd">
-                                    <v-row>
-                                        <v-col>
-                                            <v-combobox v-model="add.school" label="学院名" variant="underlined"
-                                                density="compact" :items="listItems?.map((v) => v[0])" />
-                                        </v-col>
-                                        <v-col><v-text-field v-model="add.major" label="专业名" variant="underlined"
-                                                density="compact" /></v-col>
-                                    </v-row>
-                                    <v-row>
-                                        <v-col>
-                                            <v-text-field v-model="add.reason" label="添加理由" variant="underlined"
-                                                density="compact" />
-                                        </v-col>
-                                    </v-row>
-                                </v-form>
-                            </v-card-text>
-                            <v-card-actions class="justify-center">
-                                <v-btn color="primary" :disabled="!validAdd" @click="submitAdd">
-                                    提交申请
-                                </v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-col>
-                </v-row>
-                <v-row justify="center">
-                    <v-col cols="12" md="6" lg="4" xl="4">
-                        <v-card title="申请删除专业" variant="outlined">
-                            <v-card-text>
-                                <v-form v-model="validDel">
-                                    <v-row>
-                                        <v-col>
-                                            <v-combobox v-model="del.school" label="学院名" variant="underlined"
-                                                density="compact" :rules="[checkSchoolName]"
-                                                :items="listItems?.map((v) => v[0])" />
-                                        </v-col>
-                                        <v-col>
-                                            <v-combobox v-model="del.major" label="专业名" variant="underlined"
-                                                density="compact" :rules="[checkMajor]" :items="majorNames" />
-                                        </v-col>
-                                    </v-row>
-                                    <v-row>
-                                        <v-col>
-                                            <v-text-field v-model="del.reason" label="删除理由" variant="underlined"
-                                                density="compact" />
-                                        </v-col>
-                                    </v-row>
-                                </v-form>
-                            </v-card-text>
-                            <v-card-actions class="justify-center">
-                                <v-btn color="primary" :disabled="!validDel" @click="submitDel()">
-                                    提交申请
-                                </v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-col>
-                </v-row>
-                <v-row justify="center">
-                    <v-col cols="12" md="6" lg="4" xl="4">
-                        <v-alert text="左侧选择具体专业可编辑专业课程文档" title="提示" type="info" variant="tonal" />
-                    </v-col>
-                </v-row>
-            </div>
-        </v-main>
+        <div v-if="$route.params.major == undefined">
+            <v-breadcrumbs :items="['编辑专业']" />
+            <v-row justify="center">
+                <v-col cols="12" md="6" lg="4" xl="4">
+                    <v-card title="申请添加专业" variant="outlined">
+                        <v-card-text>
+                            <v-form v-model="validAdd">
+                                <v-row>
+                                    <v-col>
+                                        <v-combobox v-model="add.school" label="学院名" variant="underlined"
+                                            density="compact" :items="listItems?.map((v) => v[0])" />
+                                    </v-col>
+                                    <v-col><v-text-field v-model="add.major" label="专业名" variant="underlined"
+                                            density="compact" /></v-col>
+                                </v-row>
+                                <v-row>
+                                    <v-col>
+                                        <v-text-field v-model="add.reason" label="添加理由" variant="underlined"
+                                            density="compact" />
+                                    </v-col>
+                                </v-row>
+                            </v-form>
+                        </v-card-text>
+                        <v-card-actions class="justify-center">
+                            <v-btn color="primary" :disabled="!validAdd" @click="submitAdd">
+                                提交申请
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-col>
+            </v-row>
+            <v-row justify="center">
+                <v-col cols="12" md="6" lg="4" xl="4">
+                    <v-card title="申请删除专业" variant="outlined">
+                        <v-card-text>
+                            <v-form v-model="validDel">
+                                <v-row>
+                                    <v-col>
+                                        <v-combobox v-model="del.school" label="学院名" variant="underlined"
+                                            density="compact" :rules="[checkSchoolName]"
+                                            :items="listItems?.map((v) => v[0])" />
+                                    </v-col>
+                                    <v-col>
+                                        <v-combobox v-model="del.major" label="专业名" variant="underlined"
+                                            density="compact" :rules="[checkMajor]" :items="majorNames" />
+                                    </v-col>
+                                </v-row>
+                                <v-row>
+                                    <v-col>
+                                        <v-text-field v-model="del.reason" label="删除理由" variant="underlined"
+                                            density="compact" />
+                                    </v-col>
+                                </v-row>
+                            </v-form>
+                        </v-card-text>
+                        <v-card-actions class="justify-center">
+                            <v-btn color="primary" :disabled="!validDel" @click="submitDel()">
+                                提交申请
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-col>
+            </v-row>
+            <v-row justify="center">
+                <v-col cols="12" md="6" lg="4" xl="4">
+                    <v-alert text="左侧选择具体专业可编辑专业课程文档" title="提示" type="info" variant="tonal" />
+                </v-col>
+            </v-row>
+        </div>
 
         <v-snackbar v-model="successSnakebar" :timeout="2000" color="success" variant="tonal">
             提交成功
@@ -92,7 +90,7 @@
         <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error" variant="tonal">
             {{ errorPrompt }}
         </v-snackbar>
-    </v-layout>
+    </v-main>
 </template>
 
 <script setup lang="ts">
@@ -171,8 +169,10 @@ const majorList = computed(() => {
     return [];
 });
 
-
-const { data: listItems } = await useAsyncData("majors", () =>
+/**
+ * 获得各个学院下的专业
+ */
+const { data: listItems } = await useAsyncData("majors-edit", () =>
     requestFetch<Major[]>("/api/majors", {
         method: "GET",
         query: {

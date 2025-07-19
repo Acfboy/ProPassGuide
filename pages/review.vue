@@ -1,8 +1,7 @@
 <template>
-    <v-layout>
-        <v-navigation-drawer permanent>
+    <v-main>
+        <v-navigation-drawer permanent class="position-fixed">
             <v-tabs v-model="tab" bg-color="transparent" color="basil" direction="vertical">
-                <!-- <v-tab v-for="item in items" :key="item" :text="item" :value="item"></v-tab> -->
                 <v-tab value="docs" to="/review/docs">
                     审核文档
                 </v-tab>
@@ -12,10 +11,8 @@
             </v-tabs>
         </v-navigation-drawer>
 
-        <v-main fill-height class="overflow-auto-x">
-            <NuxtPage />
-        </v-main>
-    </v-layout>
+        <NuxtPage />
+    </v-main>
 </template>
 
 <script setup lang="ts">
@@ -33,3 +30,4 @@ const tab = ref<"docs" | "majors">(type == "majors" ? "majors" : "docs");
 
 
 </script>
+

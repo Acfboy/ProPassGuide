@@ -38,6 +38,7 @@ export default defineEventHandler(async (event): Promise<ProposalWithDoc> => {
 
     const proposal = await docs.findOne<CourseWithDbId>({
         _id: new ObjectId(review_id),
+        "proposal.accept": false,
     });
     if (!proposal)
         throw createError({ statusCode: 404, message: "没有这个申请" });

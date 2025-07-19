@@ -1,5 +1,5 @@
 <template>
-    <div style="height: 100%;">
+    <div class="fill-height">
         <v-navigation-drawer permanent>
             <v-list>
                 <v-list-group v-for="(gradeCourses, index) in listItems" v-show="gradeCourses.length" :key="index"
@@ -18,7 +18,7 @@
                 </v-list-group>
             </v-list>
         </v-navigation-drawer>
-        <NuxtPage :majors="props.majors" />
+        <NuxtPage :majors="props.majors" class="fill-height" />
         <div v-if="$route.params.doc == undefined">
 
             <v-breadcrumbs>
@@ -111,6 +111,9 @@ const proposeDelete = () => {
 
 const requestFetch = useRequestFetch();
 
+/**
+ * 分年级和类别的课程列表
+ */
 const { data: listItems } = await useAsyncData(`major-${majorId}`, () =>
     requestFetch<CourseInfo[]>("/api/courses", {
         method: "GET",

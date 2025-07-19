@@ -50,7 +50,7 @@ import type { CourseWithDbId } from '~/utils/types';
 
 const requestFetch = useRequestFetch();
 
-const { data: majorItems } = await useAsyncData("majors", () =>
+const { data: majorItems } = await useAsyncData("majors-review", () =>
     requestFetch<Major[]>("/api/majors", {
         method: "GET",
         query: {

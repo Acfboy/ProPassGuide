@@ -45,10 +45,14 @@ export default defineEventHandler(async (event) => {
     const attachments = await getCollection("attachments");
 
     if (query.accept === true) {
-        await docs.updateOne(
+        const updateRes = await docs.updateOne(
             { _id: new ObjectId(query.proposal_id) },
             { $set: { "proposal.accept": true } }
         );
+
+        if (updateRes.modifiedCount === 0) 
+            throw createError({ statusCode:404, message: "申请不存在或已经审核"});
+
         console.log(doc_str);
         const res = await docs.updateOne(
             { major_id, course_id, proposal: null },

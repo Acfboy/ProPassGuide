@@ -1,5 +1,5 @@
 <template>
-    <div ref="totalSpace" style="height: 100%;">
+    <div v-if="!submitted" ref="totalSpace" style="height: 100%;">
         <v-breadcrumbs>
             <v-breadcrumbs-item to="/edit">编辑专业</v-breadcrumbs-item>
             <v-breadcrumbs-divider />
@@ -118,9 +118,11 @@
             </v-file-input>
             <v-divider />
             <v-list line="two">
-                <v-list-item v-for="(a, index) in totalAttachments" :key="index" :title="a.name" :subtitle="a.timestamp">
+                <v-list-item v-for="(a, index) in totalAttachments" :key="index" :title="a.name"
+                    :subtitle="a.timestamp">
                     <template #append>
-                        <v-btn icon="mdi-content-copy" variant="text" density="compact" @click="toClipboard(`/api/files/${a.file_id}`)"/>
+                        <v-btn icon="mdi-content-copy" variant="text" density="compact"
+                            @click="toClipboard(`/api/files/${a.file_id}`)" />
                     </template>
                 </v-list-item>
             </v-list>
@@ -133,6 +135,19 @@
             {{ errorPrompt }}
         </v-snackbar>
     </div>
+    <div v-else>
+        <v-row justify="center">
+            <v-sheet class="pa-4 ma-4 text-center mx-auto" elevation="12" max-width="600" rounded="lg" width="100%">
+                <v-icon class="mb-5" color="success" icon="mdi-check-circle" size="112"/>
+
+                <h2 class="text-h5 mb-6">提交成功</h2>
+
+                <p class="mb-4 text-medium-emphasis text-body-2">
+                    感谢您的贡献。更改会在通过审核后显示。您可以在个人主页查看审核结果。
+                </p>
+            </v-sheet>
+        </v-row>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -140,8 +155,10 @@ import type { VTabs } from 'vuetify/components';
 import type { VRow } from 'vuetify/components/VGrid';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import useClipboard  from "vue-clipboard3";
+import useClipboard from "vue-clipboard3";
 import type { CourseWithDbId } from '~/utils/types';
+// import remarkMath from 'remark-math';
+// import rehypeMathjax from 'rehype-mathjax';
 
 const route = useRoute();
 const { toClipboard } = await useClipboard();
@@ -180,6 +197,8 @@ onMounted(() => {
     });
 
 });
+
+const submitted = ref(false);
 
 const classNames = ["必修", "公共", "限选"];
 
@@ -345,7 +364,7 @@ const submit = () => {
             newAttachments: newAttachments.value,
         }
     }).then(() => {
-        successSnakebar.value = true;
+        submitted.value = true;
     }).catch((err) => {
         errorPrompt.value = err.data.message;
         errorSnakebar.value = true;
@@ -378,7 +397,7 @@ const uploadFiles = () => {
     }
 };
 
-const { data: existAttachments } = useAsyncData(`attachments-${majorId}-${docId}`, () => 
+const { data: existAttachments } = useAsyncData(`attachments-${majorId}-${docId}`, () =>
     requestFetch<AttachmentInfo[]>("/api/files/info", {
         method: "GET",
         query: {
@@ -421,3 +440,24 @@ watch(course, (newCourseData) => {
 }, { immediate: true });
 
 </script>
+
+<style>
+h2 a,
+h3 a,
+h4 a,
+h5 a,
+h6 a {
+    color: black;
+    text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+</style>

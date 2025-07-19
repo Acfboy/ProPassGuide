@@ -1,7 +1,227 @@
 <template>
-    <p> {{  toRaw(router).currentRoute.value.fullPath }}</p>
+    <div>
+        <v-row justify="center" class="ma-2">
+            <v-col cols="12" md="10">
+                <v-sheet>
+                    <v-row>
+                        <v-col>
+                            <p class="text-h4 mb-2">{{ course?.course_name }}</p>
+                        </v-col>
+                        <div class="ma-4">
+                            <v-icon icon="mdi-file-edit-outline" @click="navigateTo(`/edit/${majorId}/${docId}`)"/>
+                        </div>
+                    </v-row>
+                    <v-chip class="mr-1" density="compact" color="green">
+                        <v-icon icon="mdi-star" class="mr-1" />
+                        学分：{{ course?.grade }}
+                    </v-chip>
+                    <v-chip class="mr-1" density="compact" color="primary">
+                        <v-icon icon="mdi-label-outline" class="mr-1" />
+                        {{ course?.class }}
+                    </v-chip>
+                    <v-chip v-if="course?.direction" class="mr-1" density="compact" color="orange">
+
+                        <v-icon icon="mdi-directions-fork" class="mr-1" />
+                        专业方向：{{
+                            course?.direction
+                        }}
+                    </v-chip>
+
+                    <MDC v-if="course" class="mt-4" :value="course?.doc_str" tag="article" />
+                </v-sheet>
+            </v-col>
+
+        </v-row>
+        <v-navigation-drawer floating location="right" class="position-fixed">
+            <div v-if="toc.length" class="toc-container mt-4">
+                <div class="toc-title">目录</div>
+                <ul class="toc-list">
+                    <li v-for="item in toc" :key="item.id" :class="{ 'active-toc': activeTocId === item.id }"
+                        :style="{ paddingLeft: (item.level - 1) * 16 + 'px' }">
+                        <a @click.prevent="scrollToAnchor(item.id)">{{ item.text }}</a>
+                    </li>
+                </ul>
+            </div>
+        </v-navigation-drawer>
+    </div>
+
 </template>
 
 <script setup lang="ts">
-const router = useRouter()
+import { useRoute } from 'vue-router';
+
+
+const route = useRoute();
+const majorId = route.params.major as string;
+const docId = route.params.doc as string;
+
+const requestFetch = useRequestFetch();
+
+/**
+ * 获得当前选择课程的具体信息
+ */
+const { data: course } = await useAsyncData(`major-${majorId}-${docId}`, () =>
+    requestFetch<CourseWithDbId>("/api/courses/doc", {
+        method: "GET",
+        query: {
+            major: majorId,
+            course: docId == "new" ? undefined : docId
+        }
+    })
+);
+
+
+interface TocItem {
+    level: number;
+    text: string;
+    id: string;
+}
+
+const toc = ref<TocItem[]>([]);
+const activeTocId = ref('');
+
+function updateActiveToc() {
+    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')) as HTMLElement[];
+    const scrollY = window.scrollY || window.pageYOffset;
+    const headerOffset = 120; // 头部高度+间距
+    let currentId = '';
+    for (let i = 0; i < headings.length; i++) {
+        const el = headings[i];
+        if (el.offsetTop - headerOffset <= scrollY) {
+            currentId = el.id;
+        } else {
+            break;
+        }
+    }
+    activeTocId.value = currentId;
+    // 目录自动滚动到激活项
+    nextTick(() => {
+        const activeLink = document.querySelector('.toc-list .active-toc');
+        const tocContainer = document.querySelector('.toc-container');
+        if (activeLink && tocContainer) {
+            const linkRect = activeLink.getBoundingClientRect();
+            const containerRect = tocContainer.getBoundingClientRect();
+            if (linkRect.top < containerRect.top || linkRect.bottom > containerRect.bottom) {
+                activeLink.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }
+        }
+    });
+}
+onMounted(() => {
+    watch(
+        () => course.value?.doc_str as string,
+        async (val) => {
+            if (!val) {
+                toc.value = [];
+                return;
+            }
+            const lines = (val as string).split('\n');
+            const headingRE = /^(#{1,6})\s+(.+)/;
+            toc.value = lines
+                .map((line): TocItem | null => {
+                    const match = line.match(headingRE);
+                    if (match) {
+                        return {
+                            level: match[1].length,
+                            text: match[2].trim(),
+                            id: match[2].trim().toLowerCase().replace(/\s+/g, '-')
+                        };
+                    }
+                    return null;
+                })
+                .filter((item): item is TocItem => !!item);
+
+            toc.value.forEach(item => {
+                const selector = `h${item.level}`;
+                const headings = document.querySelectorAll(selector);
+                headings.forEach(heading => {
+                    if (heading.textContent && heading.textContent.trim() === item.text) {
+                        item.id = heading.id;
+                    }
+                });
+            });
+            console.log(toc.value);
+        },
+        { immediate: true }
+    );
+    window.addEventListener('scroll', updateActiveToc, { passive: true });
+    nextTick(updateActiveToc);
+
+});
+function scrollToAnchor(id: string) {
+    const el = document.getElementById(id);
+    console.log(id);
+    console.log(el);
+    if (el) {
+        const headerOffset = 112; // header高度
+        const y = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+}
+
 </script>
+
+<style>
+h2 a,
+h3 a,
+h4 a,
+h5 a,
+h6 a {
+    color: black;
+    text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+
+.toc-title {
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #1976d2;
+    font-size: 1.1rem;
+}
+
+.toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc-list li {
+    margin-left: 0;
+    padding-left: 16px;
+    border-left: rgba(192, 192, 192, 0.788) solid 2px;
+    font-size: 0.98rem;
+}
+
+.toc-list a {
+    color: rgb(49, 49, 49);
+    text-decoration: none;
+    transition: color 0.2s;
+    cursor: pointer;
+    padding: 2px 6px;
+    display: inline-block;
+}
+
+.toc-list a:hover {
+    color: #1565c0;
+}
+
+.toc-list li.active-toc a {
+    color: #1565c0;
+}
+
+.toc-list li.active-toc {
+    padding-left: 16px;
+    border-left: #1565c0 solid 2px;
+    font-size: 0.98rem;
+}
+</style>

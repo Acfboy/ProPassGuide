@@ -1,32 +1,61 @@
 <template>
-  <v-app>
-    <v-toolbar border color="white">
-      <template #prepend>
-        <v-icon class="ma-3" icon="mdi-school" />
-      </template>
-      <v-toolbar-title @click="navigateTo('/')">{{ config.public.siteTitle }}</v-toolbar-title>
-
-    </v-toolbar>
-    <NuxtPage />
-  </v-app>
+    <v-app>
+        <v-layout>
+            <v-app-bar flat border class="position-fixed">
+                <v-toolbar border color="white">
+                    <template #prepend>
+                        <v-btn icon="mdi-menu" variant="text" class="d-md-none" @click="toggleSidebar" />
+                        <v-icon class="ma-3 d-none d-md-block" icon="mdi-school" />
+                    </template>
+                    <v-toolbar-title class="site-title" @click="navigateTo('/')">{{ config.public.siteTitle
+                    }}</v-toolbar-title>
+                    <v-spacer />
+                    <div class="toolbar-toptabs-wrapper">
+                        <TopTabs />
+                    </div>
+                </v-toolbar>
+            </v-app-bar>
+            <NuxtPage />
+        </v-layout>
+    </v-app>
 </template>
 
 <script lang="ts" setup>
+// import SearchBar from '~/components/SearchBar.vue';
+import TopTabs from '~/components/TopTabs.vue';
+// import Sidebar from '~/components/Sidebar.vue';
 const config = useRuntimeConfig();
+
+const router = useRouter();
+
+// 侧边栏状态管理
+const sidebarDrawer = ref(true);
+function toggleSidebar() {
+    sidebarDrawer.value = !sidebarDrawer.value;
+}
+function navigateTo(path: string) {
+    router.push(path);
+}
 </script>
 
 <style>
 ::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: 3px;
-  height: 3px;
+    -webkit-appearance: none;
+    width: 3px;
+    height: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  cursor: pointer;
-  border-radius: 5px;
-  background: rgba(0, 0, 0, 0.15);
-  transition: color 0.2s ease;
+    cursor: pointer;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.15);
+    transition: color 0.2s ease;
 }
 
+.site-title {
+    font-weight: bold;
+    font-size: 1.25rem;
+    cursor: pointer;
+    min-width: 200px;
+}
 </style>
