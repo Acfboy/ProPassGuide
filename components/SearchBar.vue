@@ -1,6 +1,6 @@
 <template>
     <div v-if="majors" ref="searchBoxRef" class="toolbar-search" :class="{ expanded: searchActive }">
-        <v-text-field ref="searchInput" variant="plain" v-model="searchKeyword" placeholder="搜索专业" prepend-inner-icon="mdi-magnify"
+        <v-text-field ref="searchInput" v-model="searchKeyword" variant="plain" placeholder="搜索专业" prepend-inner-icon="mdi-magnify"
             clearable hide-details density="compact" :class="{ 'search-active': searchActive }" @focus="onSearchFocus"
             @blur="onSearchBlur" @click="onSearchFocus" @input="onInput" />
         <!-- 下拉搜索结果，使用fixed定位和高z-index -->

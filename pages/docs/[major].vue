@@ -1,6 +1,6 @@
 <template>
     <v-main>
-        <v-navigation-drawer permanent class="position-fixed" v-if="listItems">
+        <v-navigation-drawer v-if="listItems" permanent class="position-fixed">
             <v-list v-if="Number(majorId) != 0" v-model:opened="listOpen">
                 <v-list-group v-for="(gradeCourses, index) in listItems" v-show="gradeCourses.length" :key="index"
                     :value="index">
