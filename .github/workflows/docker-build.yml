@@ -12,6 +12,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 23  
+
+      - name: Install pnpm
+        run: npm install -g pnpm  
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Nuxt application
+        run: pnpm run build  
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3  # 添加 QEMU 支持跨架构构建
