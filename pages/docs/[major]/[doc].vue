@@ -13,9 +13,9 @@
                     </v-row>
                     <v-chip v-if="course?.grade" class="mr-1" density="compact" color="green">
                         <v-icon icon="mdi-star" class="mr-1" />
-                        学分：{{ course?.grade }}
+                        学分：{{ course?.credit }}
                     </v-chip>
-                    <v-chip v-if="course?.class" class="mr-1" density="compact"  color="primary">
+                    <v-chip v-if="course?.class" class="mr-1" density="compact" color="primary">
                         <v-icon icon="mdi-label-outline" class="mr-1" />
                         {{ course?.class }}
                     </v-chip>
@@ -27,22 +27,26 @@
                         }}
                     </v-chip>
 
-                    <MDC v-if="course" class="mt-4" :value="course?.doc_str" tag="article" />
+                    <div class="article">
+                        <MDC v-if="course" class="mt-4" :value="course?.doc_str" tag="article" />
+                    </div>
 
-                    <v-divider class="mt-6"/>
+                    <v-divider class="mt-6" />
 
                     <v-sheet style="border-left: red solid 4px;" class="mt-6 pl-4" variant="text">
                         <span>
                             <p class="text-disabled">
                                 <v-icon class="mr-1">mdi-pencil</v-icon>
                                 发现错误？想一起完善？
-                                <a style="color: blue" class="text-decoration-none cursor-pointer" @click="navigateTo(`/edit/${majorId}/${docId}`)">编辑此页</a>
+                                <a style="color: blue" class="text-decoration-none cursor-pointer"
+                                    @click="navigateTo(`/edit/${majorId}/${docId}`)">编辑此页</a>
                             </p>
-                            
+
                             <p class="text-disabled">
                                 <v-icon class="mr-1">mdi-code-braces</v-icon>
                                 网站功能不够完善，我想贡献！
-                                <a href="https://github.com/Acfboy/ProPassGuide" class=" text-decoration-none">在 Github 上贡献代码</a>
+                                <a href="https://github.com/Acfboy/ProPassGuide" class=" text-decoration-none">在 Github
+                                    上贡献代码</a>
                             </p>
                         </span>
                     </v-sheet>
@@ -51,8 +55,10 @@
 
         </v-row>
         <v-navigation-drawer floating location="right" class="position-fixed">
+            <template #prepend>
+                <p class="text-h6 mt-4">目录</p>
+            </template>
             <div v-if="toc.length" class="toc-container mt-4">
-                <div class="toc-title">目录</div>
                 <ul class="toc-list">
                     <li v-for="item in toc" :key="item.id" :class="{ 'active-toc': activeTocId === item.id }"
                         :style="{ paddingLeft: (item.level - 1) * 16 + 'px' }">
@@ -88,6 +94,16 @@ const { data: course } = await useAsyncData(`major-${majorId}-${docId}`, () =>
     })
 );
 
+if (course.value?.link) {
+    course.value = await
+        requestFetch<CourseWithDbId>("/api/courses/doc", {
+            method: "GET",
+            query: {
+                major: course.value.link.major_id,
+                course: course.value.link.course_id,
+            }
+        })
+}
 
 interface TocItem {
     level: number;
@@ -183,6 +199,7 @@ h4 a,
 h5 a,
 h6 a {
     color: black;
+    font-weight: 500;
     text-decoration: none;
 }
 
@@ -238,5 +255,17 @@ h6 {
     padding-left: 16px;
     border-left: #1565c0 solid 2px;
     font-size: 0.98rem;
+}
+
+.article p {
+    line-height: 1.8;
+}
+
+
+.article li {
+    line-height: 1.8;
+    margin-left: 1em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
 </style>

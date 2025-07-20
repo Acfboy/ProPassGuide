@@ -26,7 +26,18 @@ export default defineEventHandler(async (event): Promise<CourseWithDbId> => {
     const { major, course } = await querySchema.parseAsync(getQuery(event));
     const docs = await getCollection("docs");
 
-    if (!course) return defaultCourse;
+    if (!course) {
+        defaultCourse.major_id = Number(major);
+        const lastCourseId = await docs
+            .find<{ course_id: number }>({})
+            .sort({ course_id: -1 })
+            .limit(1)
+            .toArray();
+        const newId = lastCourseId[0].course_id + 1;
+        defaultCourse.course_id = newId;
+        return defaultCourse;
+    }
+    
     const data = await docs.findOne<CourseWithDbId>({
         major_id: Number(major),
         course_id: Number(course),

@@ -41,6 +41,14 @@ export default defineNuxtConfig({
         },
         rehypePlugins: {
             "rehype-mathjax": {},
-        }
+        },
+    },
+    vuetify: {
+        vuetifyOptions: {
+            locale: {
+                locale: "zhHans",
+            },
+            localeMessages: ['zhHans'],
+        },
     },
 });

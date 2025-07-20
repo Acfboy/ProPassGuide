@@ -5,20 +5,11 @@
         <p class="text-h2 font-weight-bold mb-4">{{ runtimeConfig.public.siteTitle }}</p>
         <p class="text-disabled text-h6">{{ runtimeConfig.public.siteSubtitle }}</p>
         <div class="mt-4">
-          <v-btn class="ma-4" variant="flat" size="large" color="primary" @click="navigateTo('/docs/0/0')">快速上手</v-btn>
+          <v-btn class="ma-4" variant="flat" size="large" color="primary" @click="navigateTo('/docs/0/0')">简介</v-btn>
           <v-btn class="ma-4" variant="outlined" size="large" color="primary" @click="navigateTo('/signup')">立即注册</v-btn>
         </div>
       </v-col>
     </v-row>
-
-    <!-- <v-row>
-      <v-col>
-        <v-btn>快速上手</v-btn>
-      </v-col>
-      <v-col>
-        <v-btn>立即注册</v-btn>
-      </v-col>
-    </v-row> -->
   </v-container>
 </template>
 

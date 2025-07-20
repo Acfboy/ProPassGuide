@@ -30,7 +30,7 @@
       </v-card>
     </v-menu>
 
-    <v-btn variant="text" class="ml-6" to="/docs/0/0" :active="false">快速开始</v-btn>
+    <v-btn variant="text" class="ml-6" to="/docs/0/0" :active="false">简介</v-btn>
     <div class="top-tabs-searchbar ml-6">
       <SearchBar />
     </div>

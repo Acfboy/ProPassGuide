@@ -26,7 +26,6 @@ const config = useRuntimeConfig();
 
 const router = useRouter();
 
-// 侧边栏状态管理
 const sidebarDrawer = ref(true);
 function toggleSidebar() {
     sidebarDrawer.value = !sidebarDrawer.value;

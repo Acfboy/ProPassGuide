@@ -1,6 +1,5 @@
 <template>
     <div ref="totalSpace" style="height: 100%;">
-        {{ errorPrompt }}
         <v-row ref="row1Space" class="ml-1 mr-1 mt-4">
             <v-col>
                 <v-text-field v-if="proposalWithDoc" v-model="proposalWithDoc.proposal.course_name" variant="outlined"
@@ -76,21 +75,21 @@
             </v-col>
         </v-row>
         <v-row v-if="proposalWithDoc && proposalWithDoc.proposal.link && !proposalWithDoc.proposal.del_id"
-            justify="center" class="ml-1 mr-1">
-            <button v-if="proposalWithDoc.oriDoc.link"
+            justify="center" class="ma-4">
+            <v-btn v-if="proposalWithDoc.oriDoc.link"
                 :to="`/docs/${proposalWithDoc.oriDoc.link.major_id}/${proposalWithDoc.oriDoc.link.course_id}`">
                 查看原先指向的页面
-            </button>
-            <button class="ml-2"
+            </v-btn>
+            <v-btn class="ml-2"
                 :to="`/docs/${proposalWithDoc.proposal.link.major_id}/${proposalWithDoc.proposal.link.course_id}`">
                 查看更新后指向的页面
-            </button>
+            </v-btn>
         </v-row>
         <v-row v-if="proposalWithDoc && proposalWithDoc.proposal.del_id">
-            <button class="ma-2"
+            <v-btn class="ma-2"
                 :to="`/docs/${proposalWithDoc.proposal.major_id}/${proposalWithDoc.proposal.course_id}`">
                 查看要删除的页面
-            </button>
+            </v-btn>
         </v-row>
 
         <v-row v-if="proposalWithDoc && !proposalWithDoc.proposal.link" ref="row3Space" class="ml-4 mr-4 mt-4">

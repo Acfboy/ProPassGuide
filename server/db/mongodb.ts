@@ -1,4 +1,5 @@
 import { MongoClient } from "mongodb";
+import type { CourseInfo } from "~/utils/types";
 
 const config = useRuntimeConfig();
 const client = new MongoClient(config.mongoDbUrl);
@@ -11,3 +12,26 @@ export async function getCollection(s: string) {
     const db = client.db("ProPassGuide");
     return db.collection(s);
 }
+
+(async () => {
+    const docs = await getCollection("docs");
+    const inited = await docs
+        .find<CourseInfo>({ major_id: 0, course_id: 0 })
+        .toArray();
+
+    if (!inited.length) {
+        docs.insertOne({
+            major_id: 0,
+            grade: 0,
+            course_name: "快速开始",
+            direction: "",
+            proposal: null,
+            credit: 0,
+            class: "",
+            course_id: 0,
+            doc_str:
+                "## 欢迎\n 欢迎使用专业指南！当您看到这句话时，服务已经成功启动了。",
+            link: null,
+        });
+    }
+})();

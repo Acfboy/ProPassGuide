@@ -136,7 +136,7 @@
         </v-snackbar>
     </div>
     <div v-else>
-        <v-row justify="center">
+        <v-row justify="center" class="mt-8">
             <v-sheet class="pa-4 ma-4 text-center mx-auto" elevation="12" max-width="600" rounded="lg" width="100%">
                 <v-icon class="mb-5" color="success" icon="mdi-check-circle" size="112"/>
 
@@ -447,6 +447,7 @@ h3 a,
 h4 a,
 h5 a,
 h6 a {
+    font-weight: 400;
     color: black;
     text-decoration: none;
 }

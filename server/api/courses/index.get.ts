@@ -16,5 +16,6 @@ export default defineEventHandler(async (event) => {
             { projection: { doc_str: 0, proposal: 0, link: 0 } }
         )
         .toArray();
+    
     return data;
 });

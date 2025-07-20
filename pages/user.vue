@@ -16,16 +16,16 @@
                 </v-card-item>
 
                 <v-card-text v-if="data">
-                    <v-row class="ma-2">
+                    <v-row>
                         <v-col class=" text-center">
-                            <p class="text-h2"> {{ data.doc.length + data.major.length }}</p>
+                            <p class="text-h3"> {{ data.doc.length + data.major.length }}</p>
 
                             <p class="text-center text-disabled mt-2" color="success"><v-icon
                                     class="mr-2">mdi-file-outline</v-icon>提交申请
                             </p>
                         </v-col>
                         <v-col class=" text-center">
-                            <p class="text-h2"> {{data.doc.filter(c => c.proposal?.accept === true).length +
+                            <p class="text-h3"> {{data.doc.filter(c => c.proposal?.accept === true).length +
                                 data.major.filter(c => c.proposal?.accept === true).length}}</p>
 
                             <p class="text-center text-disabled mt-2" color="success"><v-icon
@@ -33,7 +33,7 @@
                             </p>
                         </v-col>
                         <v-col class=" text-center">
-                            <p class="text-h2"> {{data.doc.filter(c => (typeof c.proposal?.accept) === "string").length
+                            <p class="text-h3"> {{data.doc.filter(c => (typeof c.proposal?.accept) === "string").length
                                 +
                                 data.major.filter(c => (typeof c.proposal?.accept) === "string").length}}</p>
                             <p class="text-center text-disabled mt-2" color="success"><v-icon
@@ -41,7 +41,7 @@
                             </p>
                         </v-col>
                         <v-col class=" text-center">
-                            <p class="text-h2"> {{data.doc.filter(c => c.proposal?.accept === false).length +
+                            <p class="text-h3"> {{data.doc.filter(c => c.proposal?.accept === false).length +
                                 data.major.filter(c => c.proposal?.accept === false).length}}</p>
                             <p class="text-center text-disabled mt-2" color="success"><v-icon
                                     class="mr-2">mdi-loading</v-icon>待审核
@@ -53,7 +53,6 @@
                 </v-card-text>
                 <v-divider/>
                 <v-card-text>
-
                     <v-data-table :items="tableItems">
                         <template #item.状态="{ value }">
                             <v-icon v-if="value === true" color="success">mdi-check</v-icon>

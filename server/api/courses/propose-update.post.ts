@@ -5,8 +5,8 @@ import type { Attachment } from "~/utils/types";
 import { SessionUserSchema } from "~/utils/types";
 
 const LinkObjectSchema = z.object({
-    major_id: z.string(),
-    course_id: z.string(),
+    major_id: z.number(),
+    course_id: z.number(),
 });
 
 const AttachmentInfoSchema = z.object({
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
 
     const id = (await docs.insertOne(data)).insertedId;
 
-    if (query.newAttachments) {
+    if (query.newAttachments?.length) {
         const attachments = await getCollection("attachments");
         attachments.insertMany(
             query.newAttachments.map(

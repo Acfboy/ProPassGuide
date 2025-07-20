@@ -1,11 +1,12 @@
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { getCollection } from "~/server/db/mongodb";
+import type { Course} from "~/utils/types";
 import { SessionUserSchema } from "~/utils/types";
 
 const LinkObjectSchema = z.object({
-    major_id: z.string(),
-    course_id: z.string(),
+    major_id: z.number(),
+    course_id: z.number(),
 });
 
 const bodySchema = z.object({
@@ -39,6 +40,7 @@ export default defineEventHandler(async (event) => {
         teachers,
         link,
         credit,
+        grade,
         ...query
     } = await readValidatedBody(event, bodySchema.parse);
     const docs = await getCollection("docs");
@@ -56,6 +58,17 @@ export default defineEventHandler(async (event) => {
                 message: "申请不存在或已经审核",
             });
 
+        if (link) {
+            const origin = await docs.findOne<Course>({
+                major_id: link.major_id,
+                course_id: link.course_id,
+            });
+            if (!origin)
+                throw createError({ statusCode: 400, message: "链接指向的文档不存在"});
+            else if (origin.link)
+                throw createError({ statusCode: 400, message: "链接指向的还是链接"});
+        }
+
         await docs.updateOne(
             { major_id, course_id, proposal: null },
             {
@@ -66,8 +79,11 @@ export default defineEventHandler(async (event) => {
                     teachers,
                     link,
                     credit,
+                    grade,
+                    class: query.class,
                 },
-            }
+            },
+            { upsert: true }
         );
         await attachments.updateMany(
             { proposal_id: new ObjectId(query.proposal_id) },

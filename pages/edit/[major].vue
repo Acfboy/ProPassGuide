@@ -119,7 +119,7 @@ const requestFetch = useRequestFetch();
 /**
  * 分年级和类别的课程列表
  */
-const { data: listItems } = await useAsyncData(`major-${majorId}`, () =>
+const { data: listItems } = await useAsyncData(`major-${majorId}-edit`, () =>
     requestFetch<CourseInfo[]>("/api/courses", {
         method: "GET",
         query: {
