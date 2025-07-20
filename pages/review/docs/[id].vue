@@ -200,7 +200,6 @@ const { data: proposalWithDoc, error } = await useAsyncData(`major-review-${prop
 );
 
 if (error.value) {
-    console.log(error.value.data);
     throw showError({ statusCode: error.value.statusCode, statusMessage: (error.value.data as { message: string }).message as string });
 }
 

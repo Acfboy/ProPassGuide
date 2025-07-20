@@ -1,7 +1,7 @@
 <template>
     <div class="fill-height">
-        <v-navigation-drawer permanent>
-            <v-list>
+        <v-navigation-drawer permanent class="position-fixed" v-if="listItems">
+            <v-list v-if="Number(majorId) != 0">
                 <v-list-group v-for="(gradeCourses, index) in listItems" v-show="gradeCourses.length" :key="index"
                     :value="index">
                     <!-- eslint-disable-next-line vue/no-template-shadow -->
@@ -10,12 +10,17 @@
                     </template>
                     <div v-for="(classAndCourses, i) in gradeCourses" :key="i">
                         <v-divider />
-                        <v-list-subheader> {{ classAndCourses[0] }}</v-list-subheader>
+                        <v-list-subheader v-if="classAndCourses[0] "> {{ classAndCourses[0] }}</v-list-subheader>
                         <v-list-item v-for="course in classAndCourses[1]" :key="course.course_id"
                             :title="course.course_name" :active="Number($route.params.doc) == course.course_id"
                             @click="navigateTo(`/edit/${route.params.major}/${course.course_id}`)" />
                     </div>
                 </v-list-group>
+            </v-list>
+            <v-list v-else>
+                <v-list-item v-for="course in listItems[0][0][1]" :key="course.course_id" :title="course.course_name"
+                    :active="Number($route.params.doc) == course.course_id"
+                    @click="navigateTo(`/edit/${route.params.major}/${course.course_id}`)" />
             </v-list>
         </v-navigation-drawer>
         <NuxtPage :majors="props.majors" class="fill-height" />

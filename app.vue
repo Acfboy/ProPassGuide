@@ -8,11 +8,11 @@
                         <v-icon class="ma-3 d-none d-md-block" icon="mdi-school" />
                     </template>
                     <v-toolbar-title class="site-title" @click="navigateTo('/')">{{ config.public.siteTitle
-                    }}</v-toolbar-title>
+                        }}</v-toolbar-title>
                     <v-spacer />
-                    <div class="toolbar-toptabs-wrapper">
+                    <template #append>
                         <TopTabs />
-                    </div>
+                    </template>
                 </v-toolbar>
             </v-app-bar>
             <NuxtPage />
@@ -21,9 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-// import SearchBar from '~/components/SearchBar.vue';
 import TopTabs from '~/components/TopTabs.vue';
-// import Sidebar from '~/components/Sidebar.vue';
 const config = useRuntimeConfig();
 
 const router = useRouter();

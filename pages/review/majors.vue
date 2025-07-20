@@ -41,7 +41,7 @@
                                 @click="operateProposal(index, false)" />
                         </td>
                         <td>
-                            <v-text-field v-model="item.proposal!.reason" density="compact" variant="underlined"
+                            <v-text-field v-model="item.proposal!.accept" density="compact" variant="underlined"
                                 hide-details width="15em" />
                         </td>
                     </tr>
@@ -64,7 +64,13 @@ const requestFetch = useRequestFetch();
 
 const { data: majorProposals } = useAsyncData(
     "major-proposals",
-    () => requestFetch<MajorProposal[]>("/api/majors/proposals", { method: "GET" })
+    () => requestFetch<MajorProposal[]>("/api/majors/proposals", { method: "GET" }).then(res => {
+        res.forEach(m => {
+            if (m.proposal)
+                m.proposal.accept = "";
+        });
+        return res;
+    })
 );
 
 const successSnakebar = ref(false);
@@ -80,7 +86,7 @@ const operateProposal = async (index: number, accept: boolean) => {
                 id: cur.del_id,
                 proposal_id: cur._id,
                 accept,
-                reason: cur.proposal?.reason,
+                reason: cur.proposal?.accept,
             }
         })
             .then(() => {
@@ -98,7 +104,7 @@ const operateProposal = async (index: number, accept: boolean) => {
             body: {
                 proposal_id: cur._id,
                 accept,
-                reason: cur.proposal?.reason,
+                reason: cur.proposal?.accept,
             }
         })
             .then(() => {

@@ -50,11 +50,13 @@ export default defineEventHandler(async (event) => {
             { $set: { "proposal.accept": true } }
         );
 
-        if (updateRes.modifiedCount === 0) 
-            throw createError({ statusCode:404, message: "申请不存在或已经审核"});
+        if (updateRes.modifiedCount === 0)
+            throw createError({
+                statusCode: 404,
+                message: "申请不存在或已经审核",
+            });
 
-        console.log(doc_str);
-        const res = await docs.updateOne(
+        await docs.updateOne(
             { major_id, course_id, proposal: null },
             {
                 $set: {
@@ -67,7 +69,6 @@ export default defineEventHandler(async (event) => {
                 },
             }
         );
-        console.log(res);
         await attachments.updateMany(
             { proposal_id: new ObjectId(query.proposal_id) },
             { $set: { accept: true } }

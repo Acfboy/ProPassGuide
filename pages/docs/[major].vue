@@ -1,7 +1,7 @@
 <template>
     <v-main>
-        <v-navigation-drawer permanent class="position-fixed">
-            <v-list>
+        <v-navigation-drawer permanent class="position-fixed" v-if="listItems">
+            <v-list v-if="Number(majorId) != 0" v-model:opened="listOpen">
                 <v-list-group v-for="(gradeCourses, index) in listItems" v-show="gradeCourses.length" :key="index"
                     :value="index">
                     <!-- eslint-disable-next-line vue/no-template-shadow -->
@@ -10,12 +10,17 @@
                     </template>
                     <div v-for="(classAndCourses, i) in gradeCourses" :key="i">
                         <v-divider />
-                        <v-list-subheader> {{ classAndCourses[0] }}</v-list-subheader>
+                        <v-list-subheader v-if="classAndCourses[0]"> {{ classAndCourses[0] }}</v-list-subheader>
                         <v-list-item v-for="course in classAndCourses[1]" :key="course.course_id"
                             :title="course.course_name" :active="Number($route.params.doc) == course.course_id"
                             @click="navigateTo(`/docs/${route.params.major}/${course.course_id}`)" />
                     </div>
                 </v-list-group>
+            </v-list>
+            <v-list v-else>
+                <v-list-item v-for="course in listItems[0][0][1]" :key="course.course_id"
+                    :title="course.course_name" :active="Number($route.params.doc) == course.course_id"
+                    @click="navigateTo(`/docs/${route.params.major}/${course.course_id}`)" />
             </v-list>
         </v-navigation-drawer>
         <NuxtPage />
@@ -27,8 +32,8 @@ import type { CourseInfo } from '~/utils/types';
 const route = useRoute();
 const majorId = route.params.major;
 
-
-const courseNames = ref<string[]>([]);
+if (!route.params.doc)
+    navigateTo(`/docs/${majorId}/0`);
 
 const requestFetch = useRequestFetch();
 
@@ -44,7 +49,6 @@ const { data: listItems } = await useAsyncData(`major-${majorId}`, () =>
     }).then((res) => {
         const courses: Map<string, CourseInfo[]>[] = Array.from({ length: 9 }, () => new Map());
         res.forEach((course) => {
-            courseNames.value.push(course.course_name);
             if (!courses[course.grade].has(course.class))
                 courses[course.grade].set(course.class, [course]);
             else
@@ -61,4 +65,16 @@ const { data: listItems } = await useAsyncData(`major-${majorId}`, () =>
         return courseList;
     })
 )
+
+const listOpen = ref<number[]>([]);
+
+if (listItems.value) {
+    for (const i in listItems.value) {
+        const item = listItems.value[i];
+        for (const [_class, courses] of item) {
+            if (courses.find(c => c.course_id == Number(route.params.doc)))
+                listOpen.value.push(Number(i));
+        }
+    }
+}
 </script>

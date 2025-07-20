@@ -1,21 +1,21 @@
 <template>
     <div>
         <v-row justify="center" class="ma-2">
-            <v-col cols="12" md="10">
+            <v-col cols="12" md="9" xl="6" lg="9">
                 <v-sheet>
                     <v-row>
                         <v-col>
                             <p class="text-h4 mb-2">{{ course?.course_name }}</p>
                         </v-col>
                         <div class="ma-4">
-                            <v-icon icon="mdi-file-edit-outline" @click="navigateTo(`/edit/${majorId}/${docId}`)"/>
+                            <v-icon icon="mdi-file-edit-outline" @click="navigateTo(`/edit/${majorId}/${docId}`)" />
                         </div>
                     </v-row>
-                    <v-chip class="mr-1" density="compact" color="green">
+                    <v-chip v-if="course?.grade" class="mr-1" density="compact" color="green">
                         <v-icon icon="mdi-star" class="mr-1" />
                         学分：{{ course?.grade }}
                     </v-chip>
-                    <v-chip class="mr-1" density="compact" color="primary">
+                    <v-chip v-if="course?.class" class="mr-1" density="compact"  color="primary">
                         <v-icon icon="mdi-label-outline" class="mr-1" />
                         {{ course?.class }}
                     </v-chip>
@@ -28,6 +28,24 @@
                     </v-chip>
 
                     <MDC v-if="course" class="mt-4" :value="course?.doc_str" tag="article" />
+
+                    <v-divider class="mt-6"/>
+
+                    <v-sheet style="border-left: red solid 4px;" class="mt-6 pl-4" variant="text">
+                        <span>
+                            <p class="text-disabled">
+                                <v-icon class="mr-1">mdi-pencil</v-icon>
+                                发现错误？想一起完善？
+                                <a style="color: blue" class="text-decoration-none cursor-pointer" @click="navigateTo(`/edit/${majorId}/${docId}`)">编辑此页</a>
+                            </p>
+                            
+                            <p class="text-disabled">
+                                <v-icon class="mr-1">mdi-code-braces</v-icon>
+                                网站功能不够完善，我想贡献！
+                                <a href="https://github.com/Acfboy/ProPassGuide" class=" text-decoration-none">在 Github 上贡献代码</a>
+                            </p>
+                        </span>
+                    </v-sheet>
                 </v-sheet>
             </v-col>
 
@@ -140,7 +158,6 @@ onMounted(() => {
                     }
                 });
             });
-            console.log(toc.value);
         },
         { immediate: true }
     );
@@ -150,8 +167,6 @@ onMounted(() => {
 });
 function scrollToAnchor(id: string) {
     const el = document.getElementById(id);
-    console.log(id);
-    console.log(el);
     if (el) {
         const headerOffset = 112; // header高度
         const y = el.getBoundingClientRect().top + window.scrollY - headerOffset;

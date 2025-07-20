@@ -1,6 +1,6 @@
 <template>
     <div v-if="majors" ref="searchBoxRef" class="toolbar-search" :class="{ expanded: searchActive }">
-        <v-text-field ref="searchInput" v-model="searchKeyword" placeholder="搜索专业" prepend-inner-icon="mdi-magnify"
+        <v-text-field ref="searchInput" variant="plain" v-model="searchKeyword" placeholder="搜索专业" prepend-inner-icon="mdi-magnify"
             clearable hide-details density="compact" :class="{ 'search-active': searchActive }" @focus="onSearchFocus"
             @blur="onSearchBlur" @click="onSearchFocus" @input="onInput" />
         <!-- 下拉搜索结果，使用fixed定位和高z-index -->
@@ -77,6 +77,8 @@ const { data: majors } = await useAsyncData("matjors-list", () =>
         query: {
             accepted: true
         }
+    }).then((res) => {
+        return res.filter((m) => m.major_id);
     })
 )
 
@@ -118,20 +120,17 @@ onBeforeUnmount(() => {
 .toolbar-search {
     transition: width 0.3s cubic-bezier(.4, 0, .2, 1), box-shadow 0.3s;
     width: 160px;
-    max-width: 100vw;
     margin-right: 16px;
     background: transparent;
-    border-radius: 24px;
     box-shadow: none;
-    display: flex;
-    align-items: center;
-    position: relative;
 }
 
 .toolbar-search.expanded {
     width: 340px;
     background: #fffbe7;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+    padding-bottom: 5px;
+    padding-left: 5px;
 }
 
 .search-active .v-field__outline {
@@ -143,7 +142,6 @@ onBeforeUnmount(() => {
     background: #fff;
     border-radius: 0 0 8px 8px;
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
-    z-index: 9999;
     max-height: 320px;
     overflow-y: auto;
 }
@@ -156,6 +154,5 @@ onBeforeUnmount(() => {
 .search-result-link:hover .v-list-item-title,
 .search-result-link:hover .v-list-item-subtitle {
     color: #1976d2;
-    text-decoration: underline;
 }
 </style>

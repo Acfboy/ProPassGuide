@@ -27,6 +27,7 @@ export default defineNuxtConfig({
             siteTitle: "",
             footerCopyright: "",
             footerNote: "",
+            siteSubtitle: "",
         },
     },
 

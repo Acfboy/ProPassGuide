@@ -11,5 +11,11 @@ export default withNuxt({
                 multiline: "ignore",
             },
         ],
+        "vue/valid-v-slot": [
+            "error",
+            {
+                allowModifiers: true,
+            },
+        ],
     },
 });

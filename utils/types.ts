@@ -29,7 +29,7 @@ export type CourseWithDbId = Course & {
 
 export interface Proposal {
     timestamp: string;
-    accept: boolean;
+    accept: boolean | string;
     user: string;
     reason: string;
 }
