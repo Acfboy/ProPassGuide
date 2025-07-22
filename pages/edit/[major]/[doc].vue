@@ -66,10 +66,10 @@
                         <v-tabs-window v-model="tab">
                             <v-tabs-window-item value="editor">
                                 <MonacoEditor v-model="newCourse.doc_str" :style="`height: ${editorHeight}px`"
-                                    lang="markdown" />
+                                    :options="{ wordWrap: 'on' }" lang="markdown" />
                             </v-tabs-window-item>
 
-                            <v-tabs-window-item value="preview" class="overflow-x-auto"
+                            <v-tabs-window-item value="preview" class="overflow-x-auto article"
                                 :style="`height: ${editorHeight}px`">
                                 <MDC :value="newCourse?.doc_str" />
                             </v-tabs-window-item>
@@ -138,7 +138,7 @@
     <div v-else>
         <v-row justify="center" class="mt-8">
             <v-sheet class="pa-4 ma-4 text-center mx-auto" elevation="12" max-width="600" rounded="lg" width="100%">
-                <v-icon class="mb-5" color="success" icon="mdi-check-circle" size="112"/>
+                <v-icon class="mb-5" color="success" icon="mdi-check-circle" size="112" />
 
                 <h2 class="text-h5 mb-6">提交成功</h2>
 
@@ -157,8 +157,6 @@ import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import useClipboard from "vue-clipboard3";
 import type { CourseWithDbId } from '~/utils/types';
-// import remarkMath from 'remark-math';
-// import rehypeMathjax from 'rehype-mathjax';
 
 const route = useRoute();
 const { toClipboard } = await useClipboard();
@@ -459,6 +457,31 @@ h4,
 h5,
 h6 {
     margin-bottom: 0.5em;
+    margin-top: 0.5em;
+}
+
+
+.article p {
+    line-height: 1.8;
+    margin-top: 1em;
+}
+
+
+.article svg {
+    margin-top: 1em;
+}
+
+.article hr {
+    margin-top: 1em;
+}
+
+.article code {
+    margin-top: 1em;
+}
+
+.article li {
+    line-height: 1.8;
+    margin-left: 1em;
     margin-top: 0.5em;
 }
 </style>

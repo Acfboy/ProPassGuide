@@ -259,13 +259,25 @@ h6 {
 
 .article p {
     line-height: 1.8;
+    margin-top: 1em;
 }
 
+
+.article svg {
+    margin-top: 1em;
+}
+
+.article hr {
+    margin-top: 1em;
+}
+
+.article code {
+    margin-top: 1em;
+}
 
 .article li {
     line-height: 1.8;
     margin-left: 1em;
     margin-top: 0.5em;
-    margin-bottom: 0.5em;
 }
 </style>

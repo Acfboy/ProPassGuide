@@ -60,8 +60,8 @@
                         <v-tabs-window v-model="tab">
                             <v-tabs-window-item value="editor">
                                 <MonacoDiffEditor v-model="proposalWithDoc.proposal.doc_str"
-                                    :original="proposalWithDoc.oriDoc.doc_str" :style="`height: ${editorHeight}px`"
-                                    lang="markdown" />
+                                    :options="{ wordWrap: 'on' }" :original="proposalWithDoc.oriDoc.doc_str"
+                                    :style="`height: ${editorHeight}px`" lang="markdown" />
                             </v-tabs-window-item>
 
                             <v-tabs-window-item value="preview" class="overflow-x-auto"

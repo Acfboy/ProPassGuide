@@ -40,7 +40,8 @@ export default defineEventHandler(async (event) => {
                     file_id: file_id,
                     timestamp: timestamp()
                 });
-                fs.renameSync(file.filepath, filePath);
+                fs.copyFileSync(file.filepath, filePath);
+                fs.unlinkSync(file.filepath);
             };
 
             if (Array.isArray(files.file)) {

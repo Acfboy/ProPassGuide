@@ -56,7 +56,7 @@ const valid = ref(false);
 const mailError = ref(false);
 const pwdAgain = ref("");
 const sended = ref(false);
-const CAPTCHA_TIME_GAP = 10;
+const CAPTCHA_TIME_GAP = 60;
 const timer = ref(CAPTCHA_TIME_GAP);
 const prompt = ref("");
 

@@ -39,7 +39,7 @@
   <v-divider vertical />
 
   <div>
-    <v-btn v-if="!loggedIn" class="ml-2 mr-2" append-icon="mdi-loggin"
+    <v-btn v-if="!loggedIn" class="ml-2 mr-2" append-icon="mdi-login"
       @click="navigateTo(`/login?redirect=${$route.path}`)">登录</v-btn>
     <v-menu v-else open-on-hover>
       <template #activator="{ props }">
