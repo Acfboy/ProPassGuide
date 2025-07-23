@@ -8,11 +8,11 @@
             <v-breadcrumbs-item :disabled="true">编辑文档</v-breadcrumbs-item>
         </v-breadcrumbs>
         <v-row ref="row1Space" class="ml-1 mr-1">
-            <v-col>
+            <v-col cols="12" md="6">
                 <v-text-field v-model="newCourse.course_name" variant="outlined" hide-details label="课程名称"
                     density="compact" />
             </v-col>
-            <v-col>
+            <v-col cols="12" md="6">
                 <v-btn-toggle v-model="toggle" divided>
                     <v-btn value="unique">
                         <span class="hidden-sm-and-down">独立页面</span>
@@ -34,22 +34,23 @@
         </v-row>
         <v-form v-model="infoValid">
             <v-row ref="row2Space" class="ml-1 mr-1 ">
-                <v-col>
+                <v-col cols="6" md="3">
                     <v-number-input v-model="newCourse.credit" :precision="1" :step="0.5" control-variant="split"
-                        label="学分" :hide-input="false" :inset="false" variant="outlined" density="compact" />
+                        label="学分" :hide-input="false" :inset="false" variant="outlined" density="compact"
+                        hide-details />
                 </v-col>
 
-                <v-col>
+                <v-col cols="6" md="3">
                     <v-combobox v-model="newCourse.class" :items="classNames" variant="outlined" density="compact"
-                        label="类型" />
+                        label="类型" hide-details />
                 </v-col>
 
-                <v-col>
+                <v-col cols="6" md="3">
                     <v-combobox v-model="grade" :items="gradeName" variant="outlined" density="compact" label="年级"
                         :rules="[checkGrade]" />
                 </v-col>
 
-                <v-col>
+                <v-col cols="6" md="3">
                     <v-text-field v-model="newCourse.direction" variant="outlined" label="专业方向" hint="不区分方向则留空"
                         density="compact" />
                 </v-col>
@@ -102,11 +103,11 @@
         </v-row>
         <v-row ref="row4Space" class="ml-4 mr-4" justify="end">
             <!-- <v-col> -->
-            <v-btn class="mt-2" :disabled="!infoValid || (toggle == 'other' && !linkValid)" color="primary"
+            <v-btn class="mt-2 mb-4" :disabled="!infoValid || (toggle == 'other' && !linkValid)" color="primary"
                 variant="tonal" @click="submit">提交</v-btn>
             <!-- </v-col> -->
         </v-row>
-        <v-navigation-drawer location="right">
+        <v-navigation-drawer :location="$vuetify.display.mobile ? 'bottom' : 'end'" permanent>
             <v-progress-linear v-show="uploadProgress != 0" v-model="uploadProgress" color="primary" />
 
             <v-file-input v-show="toggle == 'unique'" v-model="selectedFiles" label="上传附件" multiple show-size counter
@@ -136,8 +137,8 @@
         </v-snackbar>
     </div>
     <div v-else>
-        <v-row justify="center" class="mt-8">
-            <v-sheet class="pa-4 ma-4 text-center mx-auto" elevation="12" max-width="600" rounded="lg" width="100%">
+        <v-row justify="center" :class="!$vuetify.display.mobile ? 'mt-8' : 'ma-4'">
+            <v-sheet class="pa-4 ma-4 text-center mx-auto" max-width="600" rounded="lg" width="100%">
                 <v-icon class="mb-5" color="success" icon="mdi-check-circle" size="112" />
 
                 <h2 class="text-h5 mb-6">提交成功</h2>
@@ -383,7 +384,7 @@ const uploadFiles = () => {
             onUploadProgress: (progressEvent) => {
                 const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
                 uploadProgress.value = percentCompleted;
-            }
+            },
         }).then((res: AxiosResponse<{ resList: AttachmentInfo[] }>) => {
             newAttachments.value = newAttachments.value.concat(res.data.resList);
             uploadProgress.value = 0;

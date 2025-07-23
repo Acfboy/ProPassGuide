@@ -1,21 +1,21 @@
 <template>
     <v-app>
         <v-layout>
-            <v-app-bar flat border class="position-fixed">
-                <v-toolbar border color="white">
+            <v-app-bar flat border class="position-fixed" :density="mobile ? 'compact' : 'comfortable'">
+                <v-toolbar border color="white" :density="mobile ? 'compact' : 'comfortable'">
                     <template #prepend>
-                        <v-btn icon="mdi-menu" variant="text" class="d-md-none" @click="toggleSidebar" />
-                        <v-icon class="ma-3 d-none d-md-block" icon="mdi-school" />
+                        <v-btn v-if="$vuetify.display.mobile && sidebarLabel" icon="mdi-menu" variant="text" @click="toggleSidebar" />
+                        <v-icon v-else class="ma-3" icon="mdi-school" />
                     </template>
-                    <v-toolbar-title class="site-title" @click="navigateTo('/')">{{ config.public.siteTitle
+                    <v-toolbar-title :class="$vuetify.display.mobile ? 'text-body-1' : ''" @click="navigateTo('/')">{{ config.public.siteTitle
                         }}</v-toolbar-title>
-                    <v-spacer />
+                    <v-spacer class="d-none d-md-block" />
                     <template #append>
                         <TopTabs />
                     </template>
                 </v-toolbar>
             </v-app-bar>
-            <NuxtPage />
+            <NuxtPage :sidebar="sidebarDrawer" />
         </v-layout>
     </v-app>
 </template>
@@ -25,11 +25,24 @@ import TopTabs from '~/components/TopTabs.vue';
 const config = useRuntimeConfig();
 
 const router = useRouter();
+const route = useRoute();
+const mobile = useNuxtApp().$vuetify.display.smAndDown;
 
-const sidebarDrawer = ref(true);
+const sidebarLabel = computed(() => {
+    const path = route.path.includes("edit");
+    return path || route.params.major;
+})
+
+const sidebarDrawer = ref(false);
 function toggleSidebar() {
     sidebarDrawer.value = !sidebarDrawer.value;
 }
+
+watch(() => route.path, () => {
+    if (mobile)
+        sidebarDrawer.value = false;
+})
+
 function navigateTo(path: string) {
     router.push(path);
 }

@@ -1,16 +1,16 @@
 <template>
     <div ref="totalSpace" style="height: 100%;">
         <v-row ref="row1Space" class="ml-1 mr-1 mt-4">
-            <v-col>
+            <v-col cols="12" md="6">
                 <v-text-field v-if="proposalWithDoc" v-model="proposalWithDoc.proposal.course_name" variant="outlined"
                     label="课程名称" density="compact" persistent-hint :hint="proposalWithDoc.oriDoc.course_name" />
             </v-col>
-            <v-col>
+            <v-col cols="12" md="6">
                 <v-alert v-if="proposalWithDoc && proposalWithDoc.proposal.del_id" type="warning" variant="outlined"
                     density="compact">
                     用户想要删除这份文档
                 </v-alert>
-                <v-alert v-if="proposalWithDoc && proposalWithDoc.oriDoc.major_id == 0" type="info" variant="outlined"
+                <v-alert v-if="proposalWithDoc && isEmpty(proposalWithDoc.oriDoc)" type="info" variant="outlined"
                     density="compact">
                     用户新建了这份文档
                 </v-alert>
@@ -25,24 +25,24 @@
         </v-row>
         <v-form v-if="proposalWithDoc" v-model="infoValid">
             <v-row ref="row2Space" class="ml-1 mr-1 ">
-                <v-col>
+                <v-col cols="6" md="3">
                     <v-number-input v-model="proposalWithDoc.proposal.credit" :precision="1" :step="0.5"
                         control-variant="split" label="学分" :hide-input="false" :inset="false" variant="outlined"
                         density="compact" perisistent-hint :hint="String(proposalWithDoc.oriDoc.credit)"
                         persistent-hint />
                 </v-col>
 
-                <v-col>
+                <v-col cols="6" md="3">
                     <v-combobox v-model="proposalWithDoc.proposal.class" :items="classNames" variant="outlined"
                         :hint="proposalWithDoc.oriDoc.class" density="compact" label="类型" persistent-hint />
                 </v-col>
 
-                <v-col>
+                <v-col cols="6" md="3">
                     <v-combobox v-model="grade" :items="gradeName" variant="outlined" density="compact" label="年级"
                         :rules="[checkGrade]" :hint="gradeName[proposalWithDoc.oriDoc.grade]" persistent-hint />
                 </v-col>
 
-                <v-col>
+                <v-col cols="6" md="3">
                     <v-text-field v-model="proposalWithDoc.proposal.direction" variant="outlined" label="专业方向"
                         density="compact" :hint="proposalWithDoc.oriDoc.direction" persistent-hint />
                 </v-col>
@@ -108,7 +108,7 @@
                 <v-btn color="success" block variant="tonal" @click="submit(true)">同意</v-btn>
             </v-col>
         </v-row>
-        <v-navigation-drawer location="right">
+        <v-navigation-drawer :location="$vuetify.display.mobile ? 'bottom' : 'end'" permanent>
             <v-list line="two">
                 <v-list-subheader>新增附件</v-list-subheader>
                 <v-list-item v-for="(a, index) in newAttachments" :key="index" :title="a.name" :subtitle="a.timestamp">
@@ -220,6 +220,12 @@ const { data: newAttachments } = useAsyncData(`proposal-new-attach-${proposalId}
         }
     })
 )
+
+const isEmpty = (c: Course): boolean => {
+    if (c.course_name.length || c.credit || c.teachers || c.direction || c.class.length || c.doc_str || c.link)
+        return false;
+    return true;
+};
 
 
 // 将选择的 grade 转换成对应编号。

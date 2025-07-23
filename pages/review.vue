@@ -1,6 +1,6 @@
 <template>
     <v-main>
-        <v-navigation-drawer permanent class="position-fixed">
+        <v-navigation-drawer :model-value="!$vuetify.display.mobile || props.sidebar" mobile-breakpoint="sm" class="position-fixed">
             <v-tabs v-model="tab" bg-color="transparent" color="basil" direction="vertical">
                 <v-tab value="docs" to="/review/docs">
                     审核文档
@@ -19,6 +19,8 @@
 definePageMeta({
     middleware: ["admin"]
 })
+
+const props = defineProps<{ sidebar: boolean }>();
 
 const route = useRoute();
 

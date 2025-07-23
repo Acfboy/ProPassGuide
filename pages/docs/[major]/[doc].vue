@@ -74,7 +74,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 
-
 const route = useRoute();
 const majorId = route.params.major as string;
 const docId = route.params.doc as string;

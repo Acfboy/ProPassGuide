@@ -1,6 +1,6 @@
 <template>
     <div class="fill-height">
-        <v-navigation-drawer v-if="listItems" permanent class="position-fixed">
+        <v-navigation-drawer v-if="listItems" mobile-breakpoint="sm" class="position-fixed" :model-value="!$vuetify.display.mobile || (props.sidebar && props.sidebarSwap)"  persistent>
             <v-list v-if="Number(majorId) != 0">
                 <v-list-group v-for="(gradeCourses, index) in listItems" v-show="gradeCourses.length" :key="index"
                     :value="index">
@@ -24,7 +24,7 @@
             </v-list>
         </v-navigation-drawer>
         <NuxtPage :majors="props.majors" class="fill-height" />
-        <div v-if="$route.params.doc == undefined">
+        <div v-if="$route.params.doc == undefined" class="ma-4">
 
             <v-breadcrumbs>
                 <v-breadcrumbs-item to="/edit">编辑专业</v-breadcrumbs-item>
@@ -81,7 +81,7 @@ import type { CourseInfo } from '~/utils/types';
 const route = useRoute();
 const majorId = route.params.major;
 
-const props = defineProps<{ majors: Major[] }>();
+const props = defineProps<{ majors: Major[], sidebar: boolean, sidebarSwap: boolean }>();
 
 const delCourse = ref({ name: "", reason: "" });
 

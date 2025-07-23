@@ -1,13 +1,17 @@
 <template>
   <div class="d-flex">
-    <v-menu v-if="schoolMajors" open-on-hover offset-y :close-on-content-click="false" attach="body">
+    <v-menu v-if="schoolMajors" open-on-hover :open-on-click="$vuetify.display.mobile" offset-y :close-on-content-click="false" attach="body">
       <template #activator="{ props }">
-        <v-btn v-bind="props" variant="text" append-icon="mdi-chevron-down">选择专业</v-btn>
+        <v-btn v-if="!$vuetify.display.mobile" v-bind="props" variant="text" append-icon="mdi-chevron-down">选择专业</v-btn>
+        <v-btn v-else v-bind="props" variant="text" icon="mdi-library-shelves" />
       </template>
       <v-card>
         <v-card-text class="overflow-auto-x" style="width: 60em">
+          <div class="top-tabs-searchbar d-md-none mb-1">
+            <SearchBar />
+          </div>
           <v-row>
-            <v-col v-for="j in 3" :key="j">
+            <v-col v-for="j in 3" :key="j" cols="12" md="4">
               <v-expansion-panels variant="accordion" flat width="20em">
                 <v-expansion-panel
                   v-for="i in Math.min(Math.floor((schoolMajors.length + 2) / 3), schoolMajors.length - Math.floor((schoolMajors.length + 2) / 3) * (j - 1))"
@@ -30,20 +34,23 @@
       </v-card>
     </v-menu>
 
-    <v-btn variant="text" class="ml-6" to="/docs/0/0" :active="false">简介</v-btn>
-    <div class="top-tabs-searchbar ml-6">
+    <v-btn v-if="!$vuetify.display.mobile" variant="text" class="ml-6" to="/docs/0/0" :active="false">简介</v-btn>
+    <v-btn v-else variant="text" to="/docs/0/0" icon="mdi-book-play-outline" :active="false"/>
+    
+    <div class="top-tabs-searchbar ml-6 d-none d-md-block">
       <SearchBar />
     </div>
   </div>
 
-  <v-divider vertical />
+  <v-divider class="d-none d-md-block" vertical />
 
   <div>
     <v-btn v-if="!loggedIn" class="ml-2 mr-2" append-icon="mdi-login"
       @click="navigateTo(`/login?redirect=${$route.path}`)">登录</v-btn>
-    <v-menu v-else open-on-hover>
+    <v-menu v-else open-on-hover :open-on-click="$vuetify.display.mobile">
       <template #activator="{ props }">
-        <v-btn v-bind="props" variant="text" class="ml-2 mr-2" append-icon="mdi-chevron-down">操作</v-btn>
+        <v-btn v-if="!$vuetify.display.mobile" v-bind="props" variant="text" class="ml-2 mr-2" append-icon="mdi-chevron-down">操作</v-btn>
+        <v-btn v-else v-bind="props" variant="text" icon="mdi-chevron-down" />
       </template>
       <v-list density="compact">
         <v-list-item prepend-icon="mdi-account" title="个人中心" to="/user" />

@@ -7,7 +7,7 @@
                     {{ (user as { name: string }).name }}
                 </v-card-title>
             </v-card> -->
-            <v-card class="ma-8" width="50vw" min-height="80vh">
+            <v-card class="ma-8" :width="$vuetify.display.mobile ? '100vw' : '50vw'" min-height="80vh">
                 <v-card-item :title="(user as { name: string }).name">
                     <template v-if="(user as { admin: boolean }).admin" #subtitle>
                         <v-icon class="me-1 pb-1" color="info" icon="mdi-account-cog" size="18"/>

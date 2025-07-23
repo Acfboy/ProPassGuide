@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-row justify="center" class="mt-4">
+        <v-row justify="center" class="mt-4 ma-4 ma-md-0">
             <v-table>
                 <thead>
                     <tr>

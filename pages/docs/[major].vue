@@ -1,6 +1,6 @@
 <template>
     <v-main>
-        <v-navigation-drawer v-if="listItems" permanent class="position-fixed">
+        <v-navigation-drawer v-if="listItems" :model-value="!$vuetify.display.mobile || props.sidebar" mobile-breakpoint="sm">
             <v-list v-if="Number(majorId) != 0" v-model:opened="listOpen">
                 <v-list-group v-for="(gradeCourses, index) in listItems" v-show="gradeCourses.length" :key="index"
                     :value="index">
@@ -36,6 +36,8 @@ if (!route.params.doc)
     navigateTo(`/docs/${majorId}/0`);
 
 const requestFetch = useRequestFetch();
+
+const props = defineProps<{ sidebar: boolean }>();
 
 /**
  * 分年级和类别的课程列表

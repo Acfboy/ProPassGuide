@@ -1,8 +1,10 @@
 <template>
     <v-main>
-        <v-navigation-drawer permanent>
+        <v-btn v-if="$route.params.major && props.sidebar" icon="mdi-swap-horizontal" class="d-md-none position-fixed right-0" style="z-index: 1000;" @click="swap = !swap" />
+        <v-navigation-drawer mobile-breakpoint="sm" :model-value="!$vuetify.display.mobile || (props.sidebar && !swap)" persistent>
             <v-list>
                 <v-list-group v-for="[school, majors] in listItems" :key="school" :value="school">
+                    <!-- eslint-disable-next-line vue/no-template-shadow -->
                     <template #activator="{ props }">
                         <v-list-item v-bind="props" :title="school" />
                     </template>
@@ -12,9 +14,8 @@
                 </v-list-group>
             </v-list>
         </v-navigation-drawer>
-        <NuxtPage :majors="majorList" />
-
-        <div v-if="$route.params.major == undefined">
+        <NuxtPage :majors="majorList" :sidebar="props.sidebar" :sidebar-swap="swap" />
+        <div v-if="$route.params.major == undefined" class="ma-4">
             <v-breadcrumbs :items="['编辑专业']" />
             <v-row justify="center">
                 <v-col cols="12" md="6" lg="4" xl="4">
@@ -97,6 +98,10 @@
 definePageMeta({
     middleware: ['auth']
 });
+
+const props = defineProps<{ sidebar: boolean }>();
+
+const swap = ref(false);
 
 const requestFetch = useRequestFetch();
 
