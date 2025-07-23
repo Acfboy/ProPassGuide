@@ -12,9 +12,9 @@ export default defineEventHandler(async (event) => {
     const validateUser = SessionUserSchema.safeParse(user);
     if (!validateUser.success) throw createError({ statusCode: 401 });
 
-    const form = formidable({ multiples: true });
-
     const uploadDir = useRuntimeConfig().uploadDir;
+    const form = formidable({ multiples: true, uploadDir });
+
 
     return new Promise((resolve, reject) => {
         form.parse(event.node.req as IncomingMessage, (err, fields, files) => {
@@ -40,8 +40,7 @@ export default defineEventHandler(async (event) => {
                     file_id: file_id,
                     timestamp: timestamp()
                 });
-                fs.copyFileSync(file.filepath, filePath);
-                fs.unlinkSync(file.filepath);
+                fs.renameSync(file.filepath, filePath);
             };
 
             if (Array.isArray(files.file)) {
