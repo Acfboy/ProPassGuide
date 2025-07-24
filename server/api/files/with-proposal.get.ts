@@ -1,11 +1,11 @@
 import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { getCollection } from "~/server/db/mongodb";
-import { SessionUserSchema  } from "~/utils/types";
-import type {AttachmentInfo} from "~/utils/types";
+import { SessionUserSchema } from "~/utils/types";
+import type { AttachmentInfo } from "~/utils/types";
 
 const querySchema = z.object({
-    proposal_id: z.string()
+    proposal_id: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -15,9 +15,7 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 401 });
     }
 
-    const { proposal_id } = await querySchema.parseAsync(
-        getQuery(event)
-    );
+    const { proposal_id } = await querySchema.parseAsync(getQuery(event));
     const attachments = await getCollection("attachments");
 
     const data = await attachments
