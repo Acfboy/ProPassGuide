@@ -6,8 +6,10 @@
         <p class="text-disabled text-h6">{{ runtimeConfig.public.siteSubtitle }}</p>
         <div class="mt-4">
           <v-btn class="ma-4" variant="flat" size="large" color="primary" @click="navigateTo('/docs/0/0')">简介</v-btn>
-          <v-btn v-if="!session.loggedIn" class="ma-4" variant="outlined" size="large" color="primary" @click="navigateTo('/signup')">立即注册</v-btn>
-          <v-btn v-else class="ma-4" variant="outlined" size="large" color="primary" @click="navigateTo('/edit')">我要贡献</v-btn>
+          <v-btn v-if="!loggedIn" class="ma-4" variant="outlined" size="large" color="primary"
+            @click="navigateTo('/signup')">立即注册</v-btn>
+          <v-btn v-else class="ma-4" variant="outlined" size="large" color="primary"
+            @click="navigateTo('/edit')">我要贡献</v-btn>
         </div>
       </v-col>
     </v-row>
@@ -16,5 +18,5 @@
 
 <script setup lang="ts">
 const runtimeConfig = useRuntimeConfig();
-const session = useUserSession();
+const { loggedIn } = useUserSession();
 </script>

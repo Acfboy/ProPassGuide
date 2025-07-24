@@ -101,7 +101,7 @@ definePageMeta({
 
 const props = defineProps<{ sidebar: boolean }>();
 
-const swap = ref(false);
+const swap = ref(true);
 
 const requestFetch = useRequestFetch();
 

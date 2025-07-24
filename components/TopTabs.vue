@@ -1,9 +1,9 @@
 <template>
   <div class="d-flex">
-    <v-menu v-if="schoolMajors" v-model="openeMajors" open-on-hover :open-on-click="$vuetify.display.mobile" offset-y :close-on-content-click="false" attach="body">
+    <v-menu v-if="schoolMajors" v-model="openMajors" :open-on-hover="!$vuetify.display.mobile" :open-on-click="$vuetify.display.mobile" offset-y :close-on-content-click="false" attach="body">
       <template #activator="{ props }">
         <v-btn v-if="!$vuetify.display.mobile" v-bind="props" variant="text" append-icon="mdi-chevron-down">选择专业</v-btn>
-        <v-btn v-else v-bind="props" variant="text" icon="mdi-library-shelves" />
+        <v-btn v-else :active="false" v-bind="props" variant="text" icon="mdi-library-shelves" />
       </template>
       <v-card>
         <v-card-text class="overflow-auto-x">
@@ -47,7 +47,7 @@
   <div>
     <v-btn v-if="!loggedIn" class="ml-2 mr-2" append-icon="mdi-login"
       @click="navigateTo(`/login?redirect=${$route.path}`)">登录</v-btn>
-    <v-menu v-else open-on-hover :open-on-click="$vuetify.display.mobile">
+    <v-menu v-else :open-on-hover="!$vuetify.display.mobile" :open-on-click="$vuetify.display.mobile">
       <template #activator="{ props }">
         <v-btn v-if="!$vuetify.display.mobile" v-bind="props" variant="text" class="ml-2 mr-2" append-icon="mdi-chevron-down">操作</v-btn>
         <v-btn v-else v-bind="props" variant="text" icon="mdi-chevron-down" />
@@ -68,10 +68,10 @@ import SearchBar from '~/components/SearchBar.vue';
 
 const { loggedIn, user, clear } = useUserSession();
 
-const openeMajors = ref(false);
+const openMajors = ref(false);
 const route = useRoute();
 
-watch(() => route.path, () => { openeMajors.value = false});
+watch(() => route.path, () => { openMajors.value = false});
 
 const requestFetch = useRequestFetch();
 /**

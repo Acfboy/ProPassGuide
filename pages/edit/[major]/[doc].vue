@@ -181,7 +181,7 @@ const totalSpace = ref<null | HTMLDivElement>(null);
 /** 
  * 计算得出编辑器应有大小。
  */
-const editorHeight = ref(0);
+const editorHeight = ref(300);
 
 onMounted(() => {
     nextTick(() => {
@@ -192,6 +192,7 @@ onMounted(() => {
         const row4Height = row4Space.value?.$el.offsetHeight || 0;
         editorHeight.value = totalHeight - row1Height * 1.5 - row2Height * 1.5 - row3Height * 1.5 - row4Height * 1.5;
         editorHeight.value *= 0.9;
+        editorHeight.value = Math.max(300, editorHeight.value);
     });
 
 });
