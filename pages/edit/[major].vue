@@ -1,6 +1,7 @@
 <template>
     <div class="fill-height">
-        <v-navigation-drawer v-if="listItems" mobile-breakpoint="sm" class="position-fixed" :model-value="!$vuetify.display.mobile || (props.sidebar && props.sidebarSwap)"  persistent>
+        <v-navigation-drawer v-if="listItems" mobile-breakpoint="sm" class="position-fixed"
+            :model-value="!$vuetify.display.mobile || (props.sidebar && props.sidebarSwap)" persistent>
             <v-list v-if="Number(majorId) != 0">
                 <v-list-group v-for="(gradeCourses, index) in listItems" v-show="gradeCourses.length" :key="index"
                     :value="index">
@@ -10,7 +11,7 @@
                     </template>
                     <div v-for="(classAndCourses, i) in gradeCourses" :key="i">
                         <v-divider />
-                        <v-list-subheader v-if="classAndCourses[0] "> {{ classAndCourses[0] }}</v-list-subheader>
+                        <v-list-subheader v-if="classAndCourses[0]"> {{ classAndCourses[0] }}</v-list-subheader>
                         <v-list-item v-for="course in classAndCourses[1]" :key="course.course_id"
                             :title="course.course_name" :active="Number($route.params.doc) == course.course_id"
                             @click="navigateTo(`/edit/${route.params.major}/${course.course_id}`)" />
@@ -67,10 +68,10 @@
             </v-row>
         </div>
 
-        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success" variant="tonal">
+        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success">
             提交成功
         </v-snackbar>
-        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error" variant="tonal">
+        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error">
             {{ errorPrompt }}
         </v-snackbar>
     </div>
@@ -109,7 +110,7 @@ const proposeDelete = () => {
     })
         .then(() => { successSnakebar.value = true; })
         .catch((err) => {
-            errorPrompt.value = err.data.message;
+            errorPrompt.value = `${err.statusCode}: ${err.data.message}`;
             errorSnakebar.value = true;
         })
 };

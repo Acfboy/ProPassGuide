@@ -50,10 +50,10 @@
         </v-row>
 
 
-        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success" variant="tonal">
+        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success">
             提交成功
         </v-snackbar>
-        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error" variant="tonal">
+        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error">
             {{ errorPrompt }}
         </v-snackbar>
     </div>
@@ -93,7 +93,7 @@ const operateProposal = async (index: number, accept: boolean) => {
                 successSnakebar.value = true;
             })
             .catch((err) => {
-                errorPrompt.value = err.data.message;
+                errorPrompt.value = `${err.statusCode}: ${err.data.message}`;
                 errorSnakebar.value = true;
             })
 

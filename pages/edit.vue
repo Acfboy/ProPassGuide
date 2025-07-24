@@ -133,7 +133,7 @@ const submitDel = () => {
     }).then(() => {
         successSnakebar.value = true;
     }).catch((err) => {
-        errorPrompt.value = err.data.message;
+        errorPrompt.value = `${err.statusCode}: ${err.data.message}`;
         errorSnakebar.value = true;
     });
 };

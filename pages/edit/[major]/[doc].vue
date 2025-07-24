@@ -15,7 +15,7 @@
             <v-col cols="12" md="6">
                 <v-btn-toggle v-model="toggle" divided>
                     <v-btn value="unique">
-                        <span class="hidden-sm-and-down">独立页面</span>
+                        <span>独立页面</span>
 
                         <v-icon end>
                             mdi-format-align-left
@@ -23,7 +23,7 @@
                     </v-btn>
 
                     <v-btn value="other">
-                        <span class="hidden-sm-and-down">使用已有文档</span>
+                        <span>使用已有文档</span>
 
                         <v-icon end>
                             mdi-open-in-new
@@ -123,16 +123,16 @@
                     :subtitle="a.timestamp">
                     <template #append>
                         <v-btn icon="mdi-content-copy" variant="text" density="compact"
-                            @click="toClipboard(`/api/files/${a.file_id}`)" />
+                            @click="clipboard.copy(`/api/files/${a.file_id}`)" />
                     </template>
                 </v-list-item>
             </v-list>
         </v-navigation-drawer>
 
-        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success" variant="tonal">
+        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success">
             提交成功
         </v-snackbar>
-        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error" variant="tonal">
+        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error">
             {{ errorPrompt }}
         </v-snackbar>
     </div>
@@ -156,11 +156,10 @@ import type { VTabs } from 'vuetify/components';
 import type { VRow } from 'vuetify/components/VGrid';
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import useClipboard from "vue-clipboard3";
+import clipboard from "clipboard";
 import type { CourseWithDbId } from '~/utils/types';
 
 const route = useRoute();
-const { toClipboard } = await useClipboard();
 const majorId = route.params.major;
 /**
  * 课程编号
@@ -365,7 +364,7 @@ const submit = () => {
     }).then(() => {
         submitted.value = true;
     }).catch((err) => {
-        errorPrompt.value = err.data.message;
+        errorPrompt.value = `${err.statusCode}: ${err.data.message}`;
         errorSnakebar.value = true;
     });
 }
@@ -383,7 +382,7 @@ const uploadFiles = () => {
         axios.post('/api/files/upload', formData, {
             onUploadProgress: (progressEvent) => {
                 const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total!);
-                uploadProgress.value = percentCompleted;
+                uploadProgress.value = Math.min(percentCompleted, 95);
             },
         }).then((res: AxiosResponse<{ resList: AttachmentInfo[] }>) => {
             newAttachments.value = newAttachments.value.concat(res.data.resList);

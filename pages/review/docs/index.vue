@@ -36,10 +36,10 @@
         </v-row>
 
 
-        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success" variant="tonal">
+        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success">
             提交成功
         </v-snackbar>
-        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error" variant="tonal">
+        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error">
             {{ errorPrompt }}
         </v-snackbar>
     </div>

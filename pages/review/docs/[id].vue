@@ -114,17 +114,17 @@
                 <v-list-item v-for="(a, index) in newAttachments" :key="index" :title="a.name" :subtitle="a.timestamp">
                     <template #append>
                         <v-btn icon="mdi-content-copy" variant="text" density="compact"
-                            @click="toClipboard(`/api/files/${a.file_id}`)" />
+                            @click="clipboard.copy(`/api/files/${a.file_id}`)" />
                         <v-btn icon="mdi-download" variant="text" density="compact" :href="`/api/files/${a.file_id}`" />
                     </template>
                 </v-list-item>
             </v-list>
         </v-navigation-drawer>
 
-        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success" variant="tonal">
+        <v-snackbar v-model="successSnakebar" :timeout="2000" color="success">
             提交成功
         </v-snackbar>
-        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error" variant="tonal">
+        <v-snackbar v-model="errorSnakebar" :timeout="2000" color="error">
             {{ errorPrompt }}
         </v-snackbar>
     </div>
@@ -133,10 +133,9 @@
 <script setup lang="ts">
 import type { VTabs } from 'vuetify/components';
 import type { VRow } from 'vuetify/components/VGrid';
-import useClipboard from "vue-clipboard3";
+import clipboard from "clipboard";
 
 const route = useRoute();
-const { toClipboard } = useClipboard();
 
 /**
  * 文档更新申请编号
@@ -256,7 +255,7 @@ const submit = (accept: string | true) => {
             successSnakebar.value = true;
             navigateTo("/review/docs");
         }).catch((err) => {
-            errorPrompt.value = err.data.message;
+            errorPrompt.value = `${err.statusCode}: ${err.data.message}`;
             errorSnakebar.value = true;
         });
     } else {

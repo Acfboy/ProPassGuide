@@ -58,10 +58,10 @@
             <template #prepend>
                 <p class="text-h6 mt-4">目录</p>
             </template>
-            <div v-if="toc.length" class="toc-container mt-4">
+            <div v-if="ast?.toc?.links && ast.toc.links.length" class="toc-container mt-4">
                 <ul class="toc-list">
-                    <li v-for="item in toc" :key="item.id" :class="{ 'active-toc': activeTocId === item.id }"
-                        :style="{ paddingLeft: (item.level - 1) * 16 + 'px' }">
+                    <li v-for="item in ast.toc.links" :key="item.id" :class="{ 'active-toc': activeTocId === item.id }"
+                        :style="{ paddingLeft: (item.depth - 1) * 16 + 'px' }">
                         <a @click.prevent="scrollToAnchor(item.id)">{{ item.text }}</a>
                     </li>
                 </ul>
@@ -104,13 +104,8 @@ if (course.value?.link) {
         })
 }
 
-interface TocItem {
-    level: number;
-    text: string;
-    id: string;
-}
+const { data: ast } = useAsyncData(() => parseMarkdown(course.value?.doc_str ?? "", { toc: { depth: 4 } }));
 
-const toc = ref<TocItem[]>([]);
 const activeTocId = ref('');
 
 function updateActiveToc() {
@@ -141,41 +136,6 @@ function updateActiveToc() {
     });
 }
 onMounted(() => {
-    watch(
-        () => course.value?.doc_str as string,
-        async (val) => {
-            if (!val) {
-                toc.value = [];
-                return;
-            }
-            const lines = (val as string).split('\n');
-            const headingRE = /^(#{1,6})\s+(.+)/;
-            toc.value = lines
-                .map((line): TocItem | null => {
-                    const match = line.match(headingRE);
-                    if (match) {
-                        return {
-                            level: match[1].length,
-                            text: match[2].trim(),
-                            id: match[2].trim().toLowerCase().replace(/\s+/g, '-')
-                        };
-                    }
-                    return null;
-                })
-                .filter((item): item is TocItem => !!item);
-
-            toc.value.forEach(item => {
-                const selector = `h${item.level}`;
-                const headings = document.querySelectorAll(selector);
-                headings.forEach(heading => {
-                    if (heading.textContent && heading.textContent.trim() === item.text) {
-                        item.id = heading.id;
-                    }
-                });
-            });
-        },
-        { immediate: true }
-    );
     window.addEventListener('scroll', updateActiveToc, { passive: true });
     nextTick(updateActiveToc);
 
@@ -270,7 +230,7 @@ h6 {
     margin-top: 1em;
 }
 
-.article code {
+.article .shiki {
     margin-top: 1em;
 }
 

@@ -49,7 +49,7 @@ export type Course = CourseInfo & {
 
 export const SessionUserSchema = z.object({
     name: z.string(),
-    admin: z.boolean(),
+    admin: z.optional(z.boolean()),
 });
 
 export const gradeName = [

@@ -4,13 +4,13 @@ export default defineNuxtConfig({
     devtools: { enabled: false },
 
     modules: [
-      "@nuxt/eslint",
-      "@nuxt/scripts",
-      "@nuxt/test-utils",
-      "vuetify-nuxt-module",
-      "nuxt-auth-utils",
-      "nuxt-monaco-editor",
-      "@nuxtjs/mdc",
+        "@nuxt/eslint",
+        "@nuxt/scripts",
+        "@nuxt/test-utils",
+        "vuetify-nuxt-module",
+        "nuxt-auth-utils",
+        "nuxt-monaco-editor",
+        "@nuxtjs/mdc",
     ],
 
     runtimeConfig: {
@@ -28,6 +28,10 @@ export default defineNuxtConfig({
             footerNote: "",
             siteSubtitle: "",
         },
+        session: {
+            maxAge: 60 * 60 * 24 * 15,
+            password: process.env.NUXT_SESSION_PASSWORD || '',
+        },
     },
 
     monacoEditor: {
@@ -41,11 +45,21 @@ export default defineNuxtConfig({
         rehypePlugins: {
             "rehype-mathjax": {},
         },
-        highlight: { 
+        highlight: {
             theme: "github-light",
-            langs: ["ts", "cpp", "markdown", "py", "rust", "c#", "js", "json", "c"],
-            wrapperStyle: true
-        },
+            langs: [
+                "ts",
+                "cpp",
+                "markdown",
+                "py",
+                "rust",
+                "c#",
+                "js",
+                "json",
+                "c",
+            ],
+            wrapperStyle: true,
+        }
     },
     vuetify: {
         vuetifyOptions: {
