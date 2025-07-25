@@ -1,6 +1,6 @@
 <template>
     <v-main>
-        <v-navigation-drawer v-if="listItems" :model-value="!$vuetify.display.mobile || props.sidebar" mobile-breakpoint="sm">
+        <v-navigation-drawer v-if="listItems" class="position-fixed" :model-value="!$vuetify.display.mobile || props.sidebar" mobile-breakpoint="sm">
             <v-list v-if="Number(majorId) != 0" v-model:opened="listOpen">
                 <v-list-group v-for="(gradeCourses, index) in listItems" v-show="gradeCourses.length" :key="index"
                     :value="index">

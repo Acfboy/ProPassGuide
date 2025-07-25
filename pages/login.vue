@@ -14,7 +14,7 @@
                                 <div>
                                     <span>还没有账号？</span>
                                     <a href="/signup">立即注册</a>
-                                    <a href="/signup" class="ml-2">忘记密码</a>
+                                    <a href="/signup?type=forget" class="ml-2">忘记密码</a>
                                 </div>
                             </div>
                         </v-form>
@@ -55,7 +55,7 @@ const login = async () => {
         const res = await $fetch('/api/login', {
             method: 'POST',
             body: {
-                email: mail.value,
+                email: mail.value.trim(),
                 password: pwd.value,
             }
         })

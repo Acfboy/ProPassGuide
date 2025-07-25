@@ -62,6 +62,8 @@ export const gradeName = [
     "大三春",
     "大四秋",
     "大四春",
+    "大五秋",
+    "大五春",
 ];
 
 export interface AttachmentInfo {

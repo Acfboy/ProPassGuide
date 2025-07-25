@@ -58,9 +58,9 @@
             <template #prepend>
                 <p class="text-h6 mt-4">目录</p>
             </template>
-            <div v-if="ast?.toc?.links && ast.toc.links.length" class="toc-container mt-4">
+            <div v-if="toc && toc.length" class="toc-container mt-4">
                 <ul class="toc-list">
-                    <li v-for="item in ast.toc.links" :key="item.id" :class="{ 'active-toc': activeTocId === item.id }"
+                    <li v-for="item in toc" :key="item.id" :class="{ 'active-toc': activeTocId === item.id }"
                         :style="{ paddingLeft: (item.depth - 1) * 16 + 'px' }">
                         <a @click.prevent="scrollToAnchor(item.id)">{{ item.text }}</a>
                     </li>
@@ -104,7 +104,32 @@ if (course.value?.link) {
         })
 }
 
-const { data: ast } = useAsyncData(() => parseMarkdown(course.value?.doc_str ?? "", { toc: { depth: 4 } }));
+interface CatalogItem {
+  id: string;
+  depth: number;
+  text: string;
+  children?: CatalogItem[];
+}
+
+const flattenCatalog = (items: CatalogItem[]): CatalogItem[] => {
+  const result: CatalogItem[] = [];
+  
+  const traverse = (currentItems: CatalogItem[]) => {
+    currentItems.forEach(item => {
+      const { children, ...itemWithoutChildren } = item;
+      result.push(itemWithoutChildren);
+      
+      if (children && children.length > 0) {
+        traverse(children);
+      }
+    });
+  };
+  
+  traverse(items);
+  return result;
+};
+
+const { data: toc } = useAsyncData(`parse-${majorId}-${docId}`, () => parseMarkdown(course.value?.doc_str ?? "", { toc: { depth: 4 } }).then(res => flattenCatalog(res.toc?.links ?? [])));
 
 const activeTocId = ref('');
 

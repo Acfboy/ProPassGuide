@@ -2,7 +2,7 @@
     <v-container class="fill-height">
         <v-row justify="center" align="center">
             <v-col cols="12" md="5" lg="4" xl="4">
-                <v-card title="注册">
+                <v-card :title=" $route.query.type == 'forget'? '忘记密码' : '注册'">
                     <v-card-text class="ma-2">
                         <v-form v-model="valid" @submit.prevent>
                             <v-text-field 
@@ -29,7 +29,7 @@
                                 <p class="text-red-darken-1">
                                     {{ prompt }}
                                 </p>
-                                <div>
+                                <div  v-if="$route.query.type != 'forget'">
                                     <span>已经有账号了？</span>
                                     <a href="/login">立即登录</a>
                                 </div>

@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
         .update(password + config.salt)
         .digest("hex");
 
-    if (!validateEmail(email) || !validateEmailDomain(email)) {
+    if (validateEmail(email) != true || validateEmailDomain(email) != true)  {
         return {
             status: "err",
             message: "请使用指定的邮箱",

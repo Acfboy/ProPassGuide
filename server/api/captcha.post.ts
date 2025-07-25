@@ -11,10 +11,10 @@ export default defineEventHandler(async (event) => {
     const { email } = await readValidatedBody(event, bodySchema.parse);
     const config = useRuntimeConfig();
 
-    if (!validateEmail(email) || !validateEmailDomain(email)) {
+    if (validateEmail(email) != true || validateEmailDomain(email) != true) {
         return {
             status: "err",
-            message: "请使用指定的邮箱",
+            message: "邮箱不合法",
         };
     }
 
