@@ -28,9 +28,9 @@ export default defineEventHandler(async (event) => {
             _id: new ObjectId(proposal_id),
         });
         const exist = await majors.findOne({
+            proposal: null,
             name: origin?.name,
             school: origin?.school,
-            proposal: null,
         });
         if (exist) {
             throw createError({ statusCode: 403, message: "该专业已存在" });

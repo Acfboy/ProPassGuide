@@ -29,7 +29,7 @@ export default defineEventHandler(async (event): Promise<CourseWithDbId> => {
     if (!course) {
         defaultCourse.major_id = Number(major);
         const lastCourseId = await docs
-            .find<{ course_id: number }>({})
+            .find<{ course_id: number }>({ major_id: Number(major) })
             .sort({ course_id: -1 })
             .limit(1)
             .toArray();
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event): Promise<CourseWithDbId> => {
         defaultCourse.course_id = newId;
         return defaultCourse;
     }
-    
+
     const data = await docs.findOne<CourseWithDbId>({
         major_id: Number(major),
         course_id: Number(course),

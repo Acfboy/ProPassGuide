@@ -8,12 +8,12 @@ const querySchema = z.object({
 
 export default defineEventHandler(async (event) => {
     const { accepted = false } = await querySchema.parseAsync(getQuery(event));
-    const users = await getCollection("majors");
+    const majors = await getCollection("majors");
     let data: Major[];
     if (accepted == "true") {
-        data = await users.find<Major>({ proposal: null }).toArray();
+        data = await majors.find<Major>({ proposal: null }).toArray();
     } else {
-        data =  await users.find<Major>({}).toArray();
+        data =  await majors.find<Major>({}).toArray();
     }
     return data;
 });

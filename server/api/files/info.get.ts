@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
 
     const data = await attachments
         .find<AttachmentInfo>(
-            { course_id, major_id, accept: true },
+            { major_id, course_id, accept: true },
             { projection: { file_id: 1, timestamp: 1, name: 1 } }
         )
         .toArray();
