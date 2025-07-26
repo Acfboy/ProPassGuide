@@ -26,7 +26,7 @@
         <v-form v-if="proposalWithDoc" v-model="infoValid">
             <v-row ref="row2Space" class="ml-1 mr-1 ">
                 <v-col cols="6" md="3">
-                    <v-number-input v-model="proposalWithDoc.proposal.credit" :precision="1" :step="0.5"
+                    <v-number-input v-model="proposalWithDoc.proposal.credit" :precision="2" :step="0.5"
                         control-variant="split" label="学分" :hide-input="false" :inset="false" variant="outlined"
                         density="compact" perisistent-hint :hint="String(proposalWithDoc.oriDoc.credit)"
                         persistent-hint />

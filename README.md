@@ -54,4 +54,4 @@ docker compose up
 
 ## 贡献
 
-项目采用 Nuxt.js 框架，Vuetify 作为前端框架。欢迎任何形式的贡献。
+项目采用 Nuxt.js 框架，Vuetify 作为 UI 框架。欢迎任何形式的贡献。

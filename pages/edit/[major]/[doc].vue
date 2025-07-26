@@ -35,7 +35,7 @@
         <v-form v-model="infoValid">
             <v-row ref="row2Space" class="ml-1 mr-1 ">
                 <v-col cols="6" md="3">
-                    <v-number-input v-model="newCourse.credit" :precision="1" :step="0.5" control-variant="split"
+                    <v-number-input v-model="newCourse.credit" :precision="2" :step="0.5" control-variant="split"
                         label="学分" :hide-input="false" :inset="false" variant="outlined" density="compact"
                         hide-details />
                 </v-col>

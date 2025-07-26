@@ -259,6 +259,10 @@ h6 {
     margin-top: 1em;
 }
 
+.article .language-text {
+    margin-top: 1em;
+}
+
 .article li {
     line-height: 1.8;
     margin-left: 1em;

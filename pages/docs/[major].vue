@@ -49,7 +49,7 @@ const { data: listItems } = await useAsyncData(`major-${majorId}`, () =>
             major: majorId
         }
     }).then((res) => {
-        const courses: Map<string, CourseInfo[]>[] = Array.from({ length: 9 }, () => new Map());
+        const courses: Map<string, CourseInfo[]>[] = Array.from({ length: 11 }, () => new Map());
         res.forEach((course) => {
             if (!courses[course.grade].has(course.class))
                 courses[course.grade].set(course.class, [course]);
