@@ -45,5 +45,16 @@ export default defineEventHandler(async (event): Promise<CourseWithDbId> => {
         deleted: { $ne: true },
     });
     if (!data) throw createError({ statusCode: 404, message: "没有这篇文档" });
+    if (data.user_only) {
+        try {
+            await requireUserSession(event);
+        } catch {
+            data.doc_str = `
+:::error
+仅限注册用户查看
+:::
+        `;
+        }
+    }
     return data;
 });

@@ -21,6 +21,7 @@ export interface CourseInfo {
     class: string;
     course_id: number;
     teachers: string[];
+    user_only?: boolean;
 }
 
 export type CourseWithDbId = Course & {
