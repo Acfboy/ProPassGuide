@@ -66,6 +66,7 @@ export default defineNuxtConfig({
         }
     },
     vuetify: {
+        labComponents: true,
         vuetifyOptions: {
             locale: {
                 locale: "zhHans",
