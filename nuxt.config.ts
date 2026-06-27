@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     ],
 
     runtimeConfig: {
+        onlyAdminUpload: "",
         mongoDbUrl: "",
         salt: "",
         mailPassword: "",

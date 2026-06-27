@@ -12,7 +12,13 @@ export default defineEventHandler(async (event) => {
     const validateUser = SessionUserSchema.safeParse(user);
     if (!validateUser.success) throw createError({ statusCode: 401 });
 
-    const uploadDir = useRuntimeConfig().uploadDir;
+    const { onlyAdminUpload, uploadDir } = useRuntimeConfig();
+    if (onlyAdminUpload && onlyAdminUpload !== "false" && !validateUser.data.admin) {
+        throw createError({
+            statusCode: 403,
+            message: "很抱歉，由于资源限制，暂时只允许管理员上传附件",
+        });
+    }
     const form = formidable({ multiples: true, uploadDir });
 
 
