@@ -9,6 +9,11 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
+  "onlyBuiltDependencies": [
+    "@parcel/watcher",
+    "better-sqlite3", 
+    "esbuild"
+  ],
   "dependencies": {
     "@nuxt/eslint": "1.5.0",
     "@nuxt/scripts": "0.11.8",
